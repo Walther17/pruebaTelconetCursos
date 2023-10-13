@@ -19,13 +19,13 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    public Optional<Usuario> getByNombreUsuario(String nombreUsuario){
-        return usuarioRepository.findByEmail(nombreUsuario);
+    public Optional<Usuario> getByEmail(String email){
+        return usuarioRepository.findByEmail(email);
     }
 
-    public boolean existsByNombreUsuario(String nombreUsuario){
-        return usuarioRepository.existsByNombreUsuario(nombreUsuario);
-    }
+    // public boolean existsByNombreUsuario(String nombreUsuario){
+    //     return usuarioRepository.existsByNombreUsuario(nombreUsuario);
+    // }
 
     public List<Usuario> getAll(){
          List<Usuario> usuario = usuarioRepository.getAllUsers();
@@ -50,7 +50,6 @@ public class UsuarioService {
 
     public void setEstadoNull(Integer id) {
             usuarioRepository.setEstadoNull(id);
-
     }
 
     public Usuario updateUsuario(Usuario usuario, Integer id) {
@@ -64,8 +63,7 @@ public class UsuarioService {
             userUpdate.setApellido(usuario.getApellido());
             userUpdate.setEmail(usuario.getEmail());
             userUpdate.setEstado(usuario.getEstado());
-            userUpdate.setNombreUsuario(usuario.getNombreUsuario());
-            userUpdate.setPassword(usuario.getPassword()); 
+             userUpdate.setPassword(usuario.getPassword()); 
             userUpdate.setRoles(usuario.getRoles());
     
             return usuarioRepository.save(userUpdate);

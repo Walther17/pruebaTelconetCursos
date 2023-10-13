@@ -18,6 +18,7 @@ import com.demo.olimacservices.security.entity.Rol;
 import com.demo.olimacservices.security.entity.Usuario;
 import com.demo.olimacservices.security.enums.RolNombre;
 import com.demo.olimacservices.security.jwt.JwtProvider;
+import com.demo.olimacservices.security.repository.UsuarioRepository;
 import com.demo.olimacservices.security.service.RolService;
 import com.demo.olimacservices.security.service.UsuarioService;
 
@@ -42,6 +43,10 @@ public class AuthController {
     UsuarioService usuarioService;
 
     @Autowired
+    UsuarioRepository usuarioRepository;
+
+
+    @Autowired
     RolService rolService;
 
     @Autowired
@@ -53,16 +58,16 @@ public class AuthController {
             return new ResponseEntity<>(new Mensaje("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
         }
 
-        if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario())) {
-            return new ResponseEntity<>(new Mensaje("Ese nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
-        }
+        // if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario())) {
+        //     return new ResponseEntity<>(new Mensaje("Ese nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
+        // }
 
         if (usuarioService.existsByEmail(nuevoUsuario.getEmail())) {
             return new ResponseEntity<>(new Mensaje("Ese email ya existe"), HttpStatus.BAD_REQUEST);
         }
 
         Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getApellido(),
-                nuevoUsuario.getNombreUsuario(), nuevoUsuario.getEmail(),
+                 nuevoUsuario.getEmail(),
                 passwordEncoder.encode(nuevoUsuario.getPassword()));
 
         Set<Rol> roles = new HashSet<>();
@@ -74,8 +79,16 @@ public class AuthController {
                 return new ResponseEntity<>(new Mensaje("El rol de administrador no está configurado"),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_USER);
+        } else if (nuevoUsuario.getRoles().contains("ROLE_CONSUMIDOR")){
+            Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CONSUMIDOR);
+            if (rolUserOptional.isPresent()) {
+                roles.add(rolUserOptional.get());
+            } else {
+                return new ResponseEntity<>(new Mensaje("El rol de usuario no está configurado"),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }else {
+             Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CREADOR);
             if (rolUserOptional.isPresent()) {
                 roles.add(rolUserOptional.get());
             } else {
@@ -84,8 +97,9 @@ public class AuthController {
             }
         }
         usuario.setRoles(roles);
-        usuarioService.save(usuario);
-
+          usuarioService.save(usuario);
+        // usuarioRepository.insertarUsuario(usuario.getNombre(), usuario.getApellido(),
+        // usuario.getEmail(), usuario.getPassword(), usuario.getEstado());
         return new ResponseEntity<>(new Mensaje("Usuario guardado"), HttpStatus.CREATED);
     }
 
