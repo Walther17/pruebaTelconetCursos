@@ -27,7 +27,7 @@ public class RolService {
     }
 
     public List<Rol> getAll(){
-        return rolRepository.findAll();
+        return rolRepository.getAllRoles();
     }
 }
 

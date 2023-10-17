@@ -24,6 +24,7 @@ import com.demo.olimacservices.security.entity.Usuario;
 
 import lombok.Data;
 
+
  
 @Data
 @Entity
@@ -46,15 +47,14 @@ public class Curso {
     @Column(name = "estado")
     @Pattern(regexp = "[AIC]", message = "El campo estado solo puede tener los valores: A Activo, I Inactivo")
     private String estado;
-
     
-    @CreatedDate
-    @Column(name = "fe_creacion", nullable = false, updatable = false)
-    private LocalDateTime feCreacion;
+    // @CreatedDate
+    // @Column(name = "fe_creacion", nullable = false, updatable = false)
+    // private LocalDateTime feCreacion;
 
-    @LastModifiedDate
-    @Column(name = "fe_actualizacion")
-    private LocalDateTime feActualizacion;
+    // @LastModifiedDate
+    // @Column(name = "fe_actualizacion")
+    // private LocalDateTime feActualizacion;
 
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> inscripciones = new HashSet<>();

@@ -21,9 +21,6 @@ public class NuevoUsuario {
     private String apellido;
 
     @NotBlank
-    private String nombreUsuario;
-
-    @NotBlank
     private String estado;
 
     @Email

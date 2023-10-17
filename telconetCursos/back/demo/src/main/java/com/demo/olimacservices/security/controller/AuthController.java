@@ -53,7 +53,7 @@ public class AuthController {
     JwtProvider jwtProvider;
 
     @PostMapping("/nuevo")
-    public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult) {
+    public ResponseEntity<?> nuevo(@Valid @RequestBody Usuario nuevoUsuario, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new Mensaje("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
         }
@@ -67,7 +67,7 @@ public class AuthController {
         }
 
         Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getApellido(),
-                 nuevoUsuario.getEmail(),
+                 nuevoUsuario.getEmail(), nuevoUsuario.getEstado(),
                 passwordEncoder.encode(nuevoUsuario.getPassword()));
 
         Set<Rol> roles = new HashSet<>();
@@ -100,7 +100,7 @@ public class AuthController {
           usuarioService.save(usuario);
         // usuarioRepository.insertarUsuario(usuario.getNombre(), usuario.getApellido(),
         // usuario.getEmail(), usuario.getPassword(), usuario.getEstado());
-        return new ResponseEntity<>(new Mensaje("Usuario guardado"), HttpStatus.CREATED);
+        return new ResponseEntity<>( usuario, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

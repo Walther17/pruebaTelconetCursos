@@ -73,13 +73,13 @@ public class Usuario {
     @Pattern(regexp = "[AI]", message = "El campo estado solo puede tener los valores: A Activo, I Inactivo")
     private String estado;
 
-    @CreatedDate
-    @Column(name = "fe_creacion", nullable = false, updatable = false)
-    private LocalDateTime feCreacion;
+    // @CreatedDate
+    // @Column(name = "fe_creacion", nullable = false, updatable = false)
+    // private LocalDateTime feCreacion;
 
-    @LastModifiedDate
-    @Column(name = "fe_actualizacion")
-    private LocalDateTime feActualizacion;
+    // @LastModifiedDate
+    // @Column(name = "fe_actualizacion")
+    // private LocalDateTime feActualizacion;
 
     @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
@@ -87,16 +87,18 @@ public class Usuario {
     inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
 
+    @JsonIgnore
      @OneToMany(mappedBy = "creador", cascade = CascadeType.ALL)
     private Set<Curso> cursosCreados = new HashSet<>();
 
     @OneToMany(mappedBy = "consumidor", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> cursosInscritos = new HashSet<>();
     
-    public Usuario(@NotNull String nombre, @NotNull String apellido, @NotNull String email, @NotNull String password) {
+    public Usuario(@NotNull String nombre, @NotNull String apellido, @NotNull String email, @NotNull String estado, @NotNull String password) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
+        this.estado = estado;
         this.password = password;
     } 
 }
