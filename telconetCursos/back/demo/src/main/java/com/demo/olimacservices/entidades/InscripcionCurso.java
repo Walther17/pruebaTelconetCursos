@@ -27,13 +27,13 @@ public class InscripcionCurso {
     @JoinColumn(name = "curso_id")
     private Curso curso;
 
-     @CreatedDate
-    @Column(name = "fe_creacion", nullable = false, updatable = false)
-    private LocalDateTime feCreacion;
+    //  @CreatedDate
+    // @Column(name = "fe_creacion", nullable = false, updatable = false)
+    // private LocalDateTime feCreacion;
 
-    @LastModifiedDate
-    @Column(name = "fe_actualizacion")
-    private LocalDateTime feActualizacion;
+    // @LastModifiedDate
+    // @Column(name = "fe_actualizacion")
+    // private LocalDateTime feActualizacion;
 
     @ManyToOne
     @JoinColumn(name = "consumidor_id")
