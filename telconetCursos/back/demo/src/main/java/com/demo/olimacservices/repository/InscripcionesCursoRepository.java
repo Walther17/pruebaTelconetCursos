@@ -1,7 +1,7 @@
 package com.demo.olimacservices.repository;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,10 +15,15 @@ import com.demo.olimacservices.entidades.InscripcionCurso;
 
  
 @Repository
-public interface InscripcionCursoRepository extends JpaRepository<InscripcionCurso, Integer>{
+public interface InscripcionesCursoRepository extends JpaRepository<InscripcionCurso, Integer>{
     
-    @Query(value = "SELECT * FROM crear_inscripcion_curso(:cursoId, :consumidorId);", nativeQuery = true)
-    InscripcionCurso crearInscripcionCurso(@Param("cursoId") Integer cursoId, @Param("consumidorId") Integer consumidorId);
+    @Query(value = "SELECT * FROM crear_inscripcion_curso(:cursoId, :consumidorId, :estado);", nativeQuery = true)
+InscripcionCurso crearInscripcionCurso(
+    @Param("cursoId") Integer cursoId,
+    @Param("consumidorId") Integer consumidorId,
+    @Param("estado") boolean estado
+);
+
 
     @Query(value = "SELECT * FROM obtener_inscripciones_de_curso(:curso_id);", nativeQuery = true)
     List<InscripcionCurso> getAllInscripcionesDeCurso(@Param("curso_id") Integer cursoId);
@@ -32,4 +37,9 @@ public interface InscripcionCursoRepository extends JpaRepository<InscripcionCur
     InscripcionCurso actualizarEstadoInscripcion(@Param("inscripcionId") Integer inscripcionId, @Param("activo") Boolean activo);
 
          
+    @Query(value = "SELECT * FROM inscripcion_curso WHERE curso_id = :cursoId AND consumidor_id = :consumidorId", nativeQuery = true)
+    Optional<InscripcionCurso> findExistingInscripcion(@Param("cursoId") Integer cursoId, @Param("consumidorId") Integer consumidorId);
+    
+    
+
 }

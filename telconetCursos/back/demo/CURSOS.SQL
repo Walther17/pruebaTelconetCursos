@@ -139,7 +139,7 @@ DECLARE
     new_inscripcion inscripcion_curso;
 BEGIN
     INSERT INTO inscripcion_curso (curso_id, consumidor_id, activo)
-    VALUES (p_curso_id, p_consumidor_id, true)
+    VALUES (p_curso_id, p_consumidor_id, false)
     RETURNING * INTO new_inscripcion;
 
     RETURN new_inscripcion;

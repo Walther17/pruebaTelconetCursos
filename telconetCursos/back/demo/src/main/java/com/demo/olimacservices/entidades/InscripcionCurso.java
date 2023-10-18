@@ -16,6 +16,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.demo.olimacservices.security.entity.Usuario;
 
+import lombok.Data;
+
+@Data
 @Entity
 @Table(name = "inscripcion_curso")
 public class InscripcionCurso {
