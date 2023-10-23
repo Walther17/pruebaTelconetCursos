@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.demo.olimacservices.entidades.Curso;
 import com.demo.olimacservices.entidades.InscripcionCurso;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
@@ -87,10 +88,11 @@ public class Usuario {
     inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
 
-    @JsonIgnore
+    @JsonBackReference
      @OneToMany(mappedBy = "creador", cascade = CascadeType.ALL)
     private Set<Curso> cursosCreados = new HashSet<>();
-
+    
+    @JsonBackReference
     @OneToMany(mappedBy = "consumidor", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> cursosInscritos = new HashSet<>();
     

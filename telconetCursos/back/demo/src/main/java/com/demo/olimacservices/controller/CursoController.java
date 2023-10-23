@@ -24,7 +24,7 @@ public class CursoController {
     @Autowired
     CursoService cursoService;
 
-     @PostMapping("/crear")
+    @PostMapping("/crear")
     public ResponseEntity<Curso> crearCurso(@RequestBody Curso cursoDTO) {
         Curso curso = cursoService.crearCurso(cursoDTO.getNombre(), cursoDTO.getCreador());
         return ResponseEntity.status(HttpStatus.CREATED).body(curso);

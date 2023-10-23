@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import com.demo.olimacservices.Message.Mensaje;
 import com.demo.olimacservices.security.dto.JwtDto;
 import com.demo.olimacservices.security.dto.LoginUsuario;
-import com.demo.olimacservices.security.dto.NuevoUsuario;
 import com.demo.olimacservices.security.entity.Rol;
 import com.demo.olimacservices.security.entity.Usuario;
 import com.demo.olimacservices.security.enums.RolNombre;

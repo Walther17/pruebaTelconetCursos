@@ -1,15 +1,12 @@
 package com.demo.olimacservices.repository;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.demo.olimacservices.entidades.InscripcionCurso;
 
 
@@ -37,9 +34,7 @@ InscripcionCurso crearInscripcionCurso(
     InscripcionCurso actualizarEstadoInscripcion(@Param("inscripcionId") Integer inscripcionId, @Param("activo") Boolean activo);
 
          
-    @Query(value = "SELECT * FROM inscripcion_curso WHERE curso_id = :cursoId AND consumidor_id = :consumidorId", nativeQuery = true)
-    Optional<InscripcionCurso> findExistingInscripcion(@Param("cursoId") Integer cursoId, @Param("consumidorId") Integer consumidorId);
-    
-    
+    @Query(value = "SELECT existe_inscripcion(:cursoId, :consumidorId)", nativeQuery = true)
+    boolean existeInscripcion(@Param("cursoId") Integer cursoId, @Param("consumidorId") Integer consumidorId);
 
 }

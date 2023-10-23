@@ -45,7 +45,7 @@ VALUES ('ROLE_CONSUMIDOR', NOW(), NOW(), 'A');
 
 
 --------------------------USUARIOS---------------------
-drop function insinsertar_usuario()
+drop function insertar_usuario()
 --- crear usuario
  CREATE OR REPLACE FUNCTION insertar_usuario(
     p_nombre VARCHAR,
@@ -66,7 +66,59 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+------------ obtener_usuario_por_id
+CREATE OR REPLACE FUNCTION obtener_usuario_por_id(p_usuario_id INT) 
+RETURNS usuario AS $$
+DECLARE
+    usuario_encontrado usuario;
+BEGIN
+    SELECT * INTO usuario_encontrado FROM usuario WHERE id = p_usuario_id;
+    RETURN usuario_encontrado;
+END;
+$$ LANGUAGE plpgsql;
+------ Actualizar el usuario con campos de auditoría
+CREATE OR REPLACE FUNCTION actualizar_usuario(
+    p_usuario_id INT,
+    p_nombre VARCHAR,
+    p_apellido VARCHAR,
+    p_email VARCHAR,
+    p_password VARCHAR,
+    p_estado VARCHAR
+) RETURNS usuario AS $$
+DECLARE
+    usuario_actualizado usuario;
+BEGIN
+    UPDATE usuario
+    SET
+        nombre = p_nombre,
+        apellido = p_apellido,
+        email = p_email,
+        password = p_password,
+        estado = p_estado
+    WHERE id = p_usuario_id
+    RETURNING * INTO usuario_actualizado;
 
+    RETURN usuario_actualizado;
+END;
+$$ LANGUAGE plpgsql;
+
+-------
+CREATE OR REPLACE FUNCTION obtener_todos_los_usuarios() 
+RETURNS SETOF usuario AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM usuario WHERE estado = 'A';
+END;
+$$ LANGUAGE plpgsql;
+---
+CREATE OR REPLACE FUNCTION eliminar_usuario(p_usuario_id INT)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE usuario
+    SET estado = 'I'
+    WHERE id = p_usuario_id;
+END;
+$$ LANGUAGE plpgsql;
 
 
 ------------------------------------CURSOS------------
@@ -191,4 +243,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
------
+---- Verifica si el usuario ya está inscrito en el curso
+CREATE OR REPLACE FUNCTION existe_inscripcion(curso_id INT, consumidor_id INT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM inscripcion_curso WHERE curso_id = curso_id AND consumidor_id = consumidor_id) THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;

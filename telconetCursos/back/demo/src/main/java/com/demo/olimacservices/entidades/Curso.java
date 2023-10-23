@@ -21,6 +21,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.demo.olimacservices.security.entity.Usuario;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Data;
 
@@ -56,6 +57,7 @@ public class Curso {
     // @Column(name = "fe_actualizacion")
     // private LocalDateTime feActualizacion;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> inscripciones = new HashSet<>();
 }

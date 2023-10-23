@@ -21,7 +21,7 @@ public class InscripcionesCursoController {
     
     @Autowired
     InscripcionesCursoService inscripcionesCursoService;
-
+ 
      @GetMapping("/curso/{cursoId}")
     public ResponseEntity<List<InscripcionCurso>> obtenerTodasLasInscripcionesDeCurso(@PathVariable Integer cursoId) {
         List<InscripcionCurso> inscripciones = inscripcionesCursoService.obtenerTodasLasInscripcionesDeCurso(cursoId);
