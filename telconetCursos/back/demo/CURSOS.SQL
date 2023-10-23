@@ -112,11 +112,17 @@ END;
 $$ LANGUAGE plpgsql;
 ---
 CREATE OR REPLACE FUNCTION eliminar_usuario(p_usuario_id INT)
-RETURNS VOID AS $$
+RETURNS usuario AS $$
+DECLARE
+    usuario_eliminado usuario;
 BEGIN
     UPDATE usuario
     SET estado = 'I'
-    WHERE id = p_usuario_id;
+    WHERE id = p_usuario_id
+
+     RETURNING * INTO usuario_eliminado;
+
+    RETURN usuario_eliminado;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -144,7 +150,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION getAllcursos()
 RETURNS SETOF curso AS $$
 BEGIN
-    RETURN QUERY SELECT * FROM curso;
+    RETURN QUERY SELECT * FROM curso WHERE estado = 'A';
 END;
 $$ LANGUAGE plpgsql;
 
@@ -178,7 +184,40 @@ BEGIN
     RETURN curso_rec;
 END;
 $$ LANGUAGE plpgsql;
-----------------
+-- Eliminar curso
+
+CREATE OR REPLACE FUNCTION eliminar_curso(p_curso_id INT)
+RETURNS curso AS $$
+DECLARE
+    curso_eliminado curso;
+BEGIN
+    UPDATE curso
+    SET estado = 'I'
+    WHERE id = p_curso_id
+
+     RETURNING * INTO curso_eliminado;
+
+    RETURN curso_eliminado;
+END;
+$$ LANGUAGE plpgsql;
+-- NUEVO UPDATE CURSOS
+CREATE OR REPLACE FUNCTION update_curso(
+    p_curso_id INT,
+    p_curso_nombre VARCHAR,
+    p_estado VARCHAR)
+RETURNS curso AS $$
+DECLARE
+    curso_actualizado curso;
+BEGIN
+    UPDATE curso 
+    SET nombre = p_curso_nombre, estado = p_estado 
+    WHERE id = p_curso_id
+
+     RETURNING * INTO curso_actualizado;
+
+    RETURN curso_actualizado;
+END;
+$$ LANGUAGE plpgsql;
 
 ---- Incripciones 
 

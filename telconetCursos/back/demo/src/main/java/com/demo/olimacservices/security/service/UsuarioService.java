@@ -115,9 +115,9 @@ public class UsuarioService {
         return usuarioRepository.actualizarUsuario(usuarioId, nombre, apellido, email, password, estado);
     }
 
-    public void eliminarUsuario(Integer usuarioId) {
+    public Usuario eliminarUsuario(Integer usuarioId) {
         try {
-            usuarioRepository.eliminarUsuario(usuarioId);
+            return usuarioRepository.eliminarUsuario(usuarioId);
         } catch (DataIntegrityViolationException e) {
              throw new IllegalArgumentException("El usuario con el ID " + usuarioId + " no se encontró.");
         }

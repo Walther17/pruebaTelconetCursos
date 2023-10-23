@@ -22,6 +22,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.demo.olimacservices.security.entity.Usuario;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -39,8 +40,8 @@ public class Curso {
     @NotBlank(message = "El campo nombre del curso no puede estar vacío")
     private String nombre;
 
-    @ManyToOne
     @JoinColumn(name = "creador_id")
+    @ManyToOne
     private Usuario creador;
 
     @NotBlank(message = "El campo estado no puede estar vacío")
@@ -57,7 +58,7 @@ public class Curso {
     // @Column(name = "fe_actualizacion")
     // private LocalDateTime feActualizacion;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> inscripciones = new HashSet<>();
 }

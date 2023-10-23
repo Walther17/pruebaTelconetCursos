@@ -3,6 +3,7 @@ package com.demo.olimacservices.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,25 @@ public class CursoService {
 
     public Curso getCursoById(Integer id) {
         return cursoRepository.getById(id);
+    }
+
+    
+    public Curso eliminarCurso(Integer cursoId) {
+        try {
+            return cursoRepository.eliminarCurso(cursoId);
+        } catch (DataIntegrityViolationException e) {
+             throw new IllegalArgumentException("El curso con el ID " + cursoId + " no se encontró.");
+        }
+    }
+
+    public Curso updateCurso(Integer cursoId, String nombre, String estado) {
+        Curso cursoExistente = cursoRepository.updateCurso(cursoId, nombre, estado);
+
+        if (cursoExistente != null) {
+            return cursoExistente;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso no encontrado");
+        }
     }
 
 }

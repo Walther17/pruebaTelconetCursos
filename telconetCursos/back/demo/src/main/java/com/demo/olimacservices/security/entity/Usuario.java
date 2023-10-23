@@ -88,11 +88,11 @@ public class Usuario {
     inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
 
-    @JsonBackReference
+    @JsonIgnore
      @OneToMany(mappedBy = "creador", cascade = CascadeType.ALL)
     private Set<Curso> cursosCreados = new HashSet<>();
     
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(mappedBy = "consumidor", cascade = CascadeType.ALL)
     private Set<InscripcionCurso> cursosInscritos = new HashSet<>();
     

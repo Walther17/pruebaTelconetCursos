@@ -13,6 +13,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.demo.olimacservices.security.entity.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -37,6 +38,7 @@ public class InscripcionCurso {
     // private LocalDateTime feActualizacion;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "consumidor_id")
     private Usuario consumidor;
 

@@ -42,11 +42,23 @@ public class CursoController {
         return ResponseEntity.ok(curso);
     }
 
-    @PutMapping("/actualizar/{cursoId}")
-    public ResponseEntity<Curso> actualizarCurso(@PathVariable Integer cursoId, @RequestBody Curso cursoRequest) {
+   
+     @PutMapping("/update/{cursoId}")
+    public ResponseEntity<Curso> updateCurso(@PathVariable Integer cursoId, @RequestBody Curso cursoRequest) {
         try {
-            Curso cursoActualizado = cursoService.actualizarCurso(cursoId, cursoRequest.getNombre(), cursoRequest.getEstado());
+            Curso cursoActualizado = cursoService.updateCurso(cursoId, cursoRequest.getNombre(), cursoRequest.getEstado());
             return new ResponseEntity<>(cursoActualizado, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    
+    @PutMapping("/eliminar/{cursoId}")
+    public ResponseEntity<Curso> eliminarCurso(@PathVariable Integer cursoId) {
+        try {
+            Curso cursoEliminado = cursoService.eliminarCurso(cursoId);
+            return new ResponseEntity<>(cursoEliminado, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
