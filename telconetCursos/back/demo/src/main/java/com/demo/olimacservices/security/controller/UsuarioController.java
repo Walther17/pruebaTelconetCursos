@@ -8,18 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-
 import com.demo.olimacservices.Message.Mensaje;
 import com.demo.olimacservices.security.entity.Usuario;
 import com.demo.olimacservices.security.service.UsuarioService;
@@ -31,6 +28,9 @@ public class UsuarioController {
 
   @Autowired
   UsuarioService usuarioService;
+
+   @Autowired
+    PasswordEncoder passwordEncoder;
 
   @GetMapping("/listar-usuarios")
   public ResponseEntity<List<Usuario>> list() {
@@ -90,15 +90,16 @@ public class UsuarioController {
 
     @PutMapping("update/{usuarioId}")
     public ResponseEntity<?> actualizarUsuario(
-        @PathVariable Integer usuarioId
+        @PathVariable Integer usuarioId, @RequestBody Usuario usuario
     ) {
       try {
-          Usuario usuario = new Usuario();
-            usuarioService.actualizarUsuario(usuarioId, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(), usuario.getPassword(), usuario.getEstado());
+             usuarioService.actualizarUsuario(usuarioId, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(), passwordEncoder.encode(usuario.getPassword()), usuario.getEstado());
             return new ResponseEntity<>(usuario, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        }catch (Exception e) {
+          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
     }
 
     

@@ -57,7 +57,6 @@ drop function insertar_usuario()
 DECLARE
     new_user usuario;
 BEGIN
-    -- Insertar el usuario con campos de auditoría
     INSERT INTO usuario (nombre, apellido, email, password, estado, fe_creacion, fe_actualizacion)
     VALUES (p_nombre, p_apellido, p_email, p_password, p_estado, now(), now())
     RETURNING * INTO new_user;
@@ -76,7 +75,7 @@ BEGIN
     RETURN usuario_encontrado;
 END;
 $$ LANGUAGE plpgsql;
------- Actualizar el usuario con campos de auditoría
+------ Actualizar el usuario  
 CREATE OR REPLACE FUNCTION actualizar_usuario(
     p_usuario_id INT,
     p_nombre VARCHAR,
@@ -102,7 +101,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--------
+------- Get All
 CREATE OR REPLACE FUNCTION obtener_todos_los_usuarios() 
 RETURNS SETOF usuario AS $$
 BEGIN
@@ -110,7 +109,7 @@ BEGIN
     SELECT * FROM usuario WHERE estado = 'A';
 END;
 $$ LANGUAGE plpgsql;
----
+--- Eliminar usuario
 CREATE OR REPLACE FUNCTION eliminar_usuario(p_usuario_id INT)
 RETURNS usuario AS $$
 DECLARE
@@ -128,6 +127,7 @@ $$ LANGUAGE plpgsql;
 
 
 ------------------------------------CURSOS------------
+----crear
 CREATE OR REPLACE FUNCTION crear_curso(
     p_nombre VARCHAR,
     p_creador_id INT,
@@ -136,7 +136,6 @@ CREATE OR REPLACE FUNCTION crear_curso(
 DECLARE
     new_curso curso;
 BEGIN
-    -- Insertar el curso con campos de auditoría
     INSERT INTO curso (nombre, creador_id, estado)
     VALUES (p_nombre, p_creador_id, 'A')
     RETURNING * INTO new_curso;
@@ -154,27 +153,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
----
-CREATE OR REPLACE FUNCTION actualizarCurso(
-    p_curso_id INT, 
-    p_nombre VARCHAR, 
-    p_estado VARCHAR)
-RETURNS TABLE (
-    id INT,
-    nombre VARCHAR,
-    estado VARCHAR
-) AS $$
-BEGIN
-    UPDATE curso 
-    SET nombre = p_nombre, estado = p_estado 
-    WHERE id = p_curso_id
-    RETURNING id, nombre, estado INTO id, nombre, estado;
-    
-    RETURN NEXT;
-END;
-$$ LANGUAGE plpgsql;
-
---
+-- Get curso por id
 CREATE OR REPLACE FUNCTION obtener_curso_por_id(p_curso_id INT)
 RETURNS curso AS $$
 DECLARE
@@ -265,31 +244,59 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 -----
----- update 
-CREATE OR REPLACE FUNCTION actualizar_estado_inscripcion(
-    p_inscripcion_id INT,
-    p_activo BOOLEAN
-) RETURNS inscripcion_curso AS $$
+---- eliminar 
+CREATE OR REPLACE FUNCTION cancelar_inscripcion(  p_inscripcion_id INT)
+RETURNS inscripcion_curso AS $$
 DECLARE
-    inscripcion inscripcion_curso;
+    anular_inscripcion inscripcion_curso;
 BEGIN
     UPDATE inscripcion_curso
-    SET activo = p_activo
+    SET activo = true
     WHERE id = p_inscripcion_id
-    RETURNING * INTO inscripcion;
+    RETURNING * INTO anular_inscripcion;
 
-    RETURN inscripcion;
+    RETURN anular_inscripcion;
 END;
 $$ LANGUAGE plpgsql;
 
+
 ---- Verifica si el usuario ya está inscrito en el curso
-CREATE OR REPLACE FUNCTION existe_inscripcion(curso_id INT, consumidor_id INT)
+CREATE OR REPLACE FUNCTION existe_inscripcion(p_curso_id INT, p_consumidor_id INT)
 RETURNS BOOLEAN AS $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM inscripcion_curso WHERE curso_id = curso_id AND consumidor_id = consumidor_id) THEN
+  IF EXISTS (SELECT 1 FROM inscripcion_curso WHERE curso_id = p_curso_id AND consumidor_id = p_consumidor_id) THEN
     RETURN TRUE;
   ELSE
     RETURN FALSE;
   END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--- get All
+
+CREATE OR REPLACE FUNCTION get_all_inscripciones() 
+RETURNS SETOF inscripcion_curso AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM usuario WHERE estado = 'A';
+END;
+$$ LANGUAGE plpgsql;
+--
+
+CREATE OR REPLACE FUNCTION suscribirse_nuevamente(
+      p_consumidor_id INT
+)
+RETURNS inscripcion_curso AS $$
+DECLARE
+    inscribirse_nuevamente inscripcion_curso;
+BEGIN
+    UPDATE inscripcion_curso 
+    SET activo = false 
+    WHERE consumidor_id = p_consumidor_id
+
+     RETURNING * INTO inscribirse_nuevamente;
+
+    RETURN inscribirse_nuevamente;
 END;
 $$ LANGUAGE plpgsql;

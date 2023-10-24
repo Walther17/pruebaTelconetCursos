@@ -102,17 +102,14 @@ public class UsuarioService {
     }
 
     public Usuario actualizarUsuario(Integer usuarioId, String nombre, String apellido, String email, String password, String estado) {
-        // if (nombre == "" || nombre.isEmpty()) {
-        //     throw new IllegalArgumentException("El nombre no puede estar vacío.");
-        // }
-        // if (apellido =="" || apellido.isEmpty()) {
-        //     throw new IllegalArgumentException("El apellido no puede estar vacío.");
-        // }
-        // if (email == "" || email.isEmpty()) {
-        //     throw new IllegalArgumentException("El email no puede estar vacío.");
-        // }
+    
+        try {
+            return usuarioRepository.actualizarUsuario(usuarioId, nombre, apellido, email, password, estado);
+            
+        } catch (Exception e) {
+             throw new IllegalArgumentException("El usuario con el ID " + usuarioId + " no se encontró.");
+        }
       
-        return usuarioRepository.actualizarUsuario(usuarioId, nombre, apellido, email, password, estado);
     }
 
     public Usuario eliminarUsuario(Integer usuarioId) {

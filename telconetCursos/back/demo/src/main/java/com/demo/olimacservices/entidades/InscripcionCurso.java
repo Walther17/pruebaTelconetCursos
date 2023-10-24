@@ -38,7 +38,6 @@ public class InscripcionCurso {
     // private LocalDateTime feActualizacion;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "consumidor_id")
     private Usuario consumidor;
 
