@@ -24,6 +24,7 @@ public interface CursoRepository extends JpaRepository<Curso, Integer> {
     @Query(value = "SELECT * FROM obtener_curso_por_id(:curso_id);", nativeQuery = true)
     Curso getById(@Param("curso_id") Integer cursoId);
 
+    boolean existsById(Integer id);
 
     @Transactional
     @Query(nativeQuery = true, value = "SELECT * FROM actualizarCurso(:curso_id, :nombre, :estado)")

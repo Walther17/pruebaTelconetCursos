@@ -1,8 +1,6 @@
 package com.demo.olimacservices.security.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,15 +47,21 @@ public class UsuarioService {
         return usuarios;
     }
 
-    public Usuario actualizarUsuario(Integer usuarioId, String nombre, String apellido, String email, String password, String estado) {
-        
+    public Usuario actualizarUsuario(Integer id, String nombre, String apellido, String email, String password, String estado) {
         try {
-            return usuarioRepository.actualizarUsuario(usuarioId, nombre, apellido, email, password, estado);
+            if (!usuarioRepository.existsById(id)) {
+                throw new IllegalArgumentException("El id no existe.");
+            }
+              // password = passwordEncoder.encode(password);
+    
+            return usuarioRepository.actualizarUsuario(id, nombre, apellido, email, password, estado);
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
         } catch (Exception e) {
-             throw new IllegalArgumentException("El usuario con el ID " + usuarioId + " no se encontró.");
+            throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
         }
-      
     }
+    
 
     public Usuario eliminarUsuario(Integer usuarioId) {
         try {

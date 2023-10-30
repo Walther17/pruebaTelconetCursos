@@ -103,4 +103,14 @@ public class Usuario {
         this.estado = estado;
         this.password = password;
     } 
+
+    public Usuario(Integer id, String nombre, @NotNull String apellido, @NotNull String email, @NotNull String password, @NotNull String estado) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+    
+        this.password = password;
+        this.estado = estado;
+    } 
 }

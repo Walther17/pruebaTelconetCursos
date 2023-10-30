@@ -28,7 +28,7 @@ public class UsuarioController {
 
   @Autowired
   UsuarioService usuarioService;
-  PasswordEncoder passwordEncoder;
+ 
 
    
   // @PreAuthorize("hasRole('ADMIN')")
@@ -84,11 +84,11 @@ public class UsuarioController {
     }
   }
 
-  @PutMapping("update/{usuarioId}")
-  public ResponseEntity<?> actualizarUsuario(@PathVariable Integer usuarioId, @RequestBody Usuario usuario) {
+  @PutMapping("actualizar/{id}")
+  public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody Usuario usuario) {
     try {
-      usuarioService.actualizarUsuario(usuarioId, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),
-          passwordEncoder.encode(usuario.getPassword()), usuario.getEstado());
+      usuarioService.actualizarUsuario(id, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),
+           usuario.getPassword(), usuario.getEstado());
       return new ResponseEntity<>(usuario, HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);

@@ -92,19 +92,26 @@ public class InscripcionesCursoService {
         }
     }
 
-    public  List<InscripcionCurso> getAllInscripcionesDeUnCurso(Integer cursoId) {
+    public List<InscripcionCurso> getAllInscripcionesDeUnCurso(Integer cursoId) {
         try {
-            List<InscripcionCurso> curso_ = inscripcionCursoRepository.getAllInscripcionesDeCurso(cursoId);
-            if (curso_.isEmpty()) {
+            // if (!cursoRepository.existsById(cursoId)) {
+            //     throw new IllegalArgumentException("El id del curso no existe");
+            // }
+    
+            List<InscripcionCurso> inscripciones = inscripcionCursoRepository.getAllInscripcionesDeCurso(cursoId);
+            
+            if (inscripciones.isEmpty()) {
                 throw new IllegalArgumentException("No hay inscripciones para el curso seleccionado");
             }
-            return inscripcionCursoRepository.getAllInscripcionesDeCurso(cursoId);
-        }  catch (RuntimeException ex) {
-            throw new IllegalArgumentException(ex.getMessage().toString(), ex.getCause());
+    
+            return inscripciones;
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
         } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage().toString(), e.getCause());
+            throw new IllegalArgumentException("Error interno del servidor: " + e.getMessage(), e.getCause());
         }
     }
+    
 
      public InscripcionCurso getInscripcionesById(Integer inscripcionId) {
         try {

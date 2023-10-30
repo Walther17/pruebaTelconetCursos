@@ -16,25 +16,8 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    // Optional<Usuario> findByNombreUsuario(String nombreUsuario);
 
     Optional<Usuario> findByEmail(String email);
-
- 
-    @Query("SELECT u FROM Usuario u WHERE u.id = :id AND u.estado = 'A' ")
-    public Usuario getUsuarioById(Integer id);
-
-    // boolean existsByNombreUsuario(String nombreUsuario);
-
-    
-    @Query("SELECT u FROM Usuario u WHERE u.estado = 'A'")
-    public List<Usuario> getAllUsers();
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Usuario u SET u.estado = null WHERE u.id = ?1 ")
-    public void setEstadoNull(Integer id);
-    
 
     /////////////////////////////////////////////////////
     
@@ -63,7 +46,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Transactional
     @Query(value = "SELECT * FROM actualizar_usuario(:p_usuario_id, :p_nombre, :p_apellido, :p_email, :p_password, :p_estado)", nativeQuery = true)
     public Usuario actualizarUsuario(
-            @Param("p_usuario_id") Integer usuarioId,
+            @Param("p_usuario_id") Integer id,
             @Param("p_nombre") String nombre,
             @Param("p_apellido") String apellido,
             @Param("p_email") String email,
