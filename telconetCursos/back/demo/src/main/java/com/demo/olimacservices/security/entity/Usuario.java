@@ -74,10 +74,12 @@ public class Usuario {
     @Pattern(regexp = "[AI]", message = "El campo estado solo puede tener los valores: A Activo, I Inactivo")
     private String estado;
 
+    @JsonIgnore
     @CreatedDate
     @Column(name = "fe_creacion", nullable = false, updatable = false)
     private LocalDateTime feCreacion;
 
+    @JsonIgnore
     @LastModifiedDate
     @Column(name = "fe_actualizacion")
     private LocalDateTime feActualizacion;

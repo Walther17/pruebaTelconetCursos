@@ -26,14 +26,14 @@ public class RolController {
     RolService rolService;
 
     @GetMapping("all")
-    public ResponseEntity<List<Rol>> getAllRoles() {
+    public ResponseEntity<?> getAllRoles() {
         try {
             List<Rol> list = rolService.getAll();
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Mensaje("No se encontraron roles activos"), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

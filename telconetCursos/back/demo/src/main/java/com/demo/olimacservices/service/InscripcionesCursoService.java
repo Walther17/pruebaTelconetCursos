@@ -17,7 +17,9 @@ public class InscripcionesCursoService {
     
     @Autowired
     InscripcionesCursoRepository inscripcionCursoRepository;
-    CursoRepository cursoRepository;
+ 
+    @Autowired
+    private CursoRepository cursoRepository;
 
     public InscripcionCurso suscribirUsuarioACurso(Curso curso, Usuario usuario) {
         try {
@@ -50,7 +52,7 @@ public class InscripcionesCursoService {
             } else {
                 throw new IllegalArgumentException("ID de inscripción no válido.");
             }
-        } catch (IllegalArgumentException ex) {
+        } catch (RuntimeException ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage(), e.getCause());
@@ -92,18 +94,18 @@ public class InscripcionesCursoService {
         }
     }
 
-    public List<InscripcionCurso> getAllInscripcionesDeUnCurso(Integer cursoId) {
+       public List<InscripcionCurso> getAllInscripcionesDeUnCurso(Integer cursoId) {
         try {
-            // if (!cursoRepository.existsById(cursoId)) {
-            //     throw new IllegalArgumentException("El id del curso no existe");
-            // }
-    
+            if (!cursoRepository.existsById(cursoId)) {
+                throw new IllegalArgumentException("El ID del curso no existe");
+            }
+
             List<InscripcionCurso> inscripciones = inscripcionCursoRepository.getAllInscripcionesDeCurso(cursoId);
-            
+
             if (inscripciones.isEmpty()) {
                 throw new IllegalArgumentException("No hay inscripciones para el curso seleccionado");
             }
-    
+
             return inscripciones;
         } catch (RuntimeException ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex.getCause());

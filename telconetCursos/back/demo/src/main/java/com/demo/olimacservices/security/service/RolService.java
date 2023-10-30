@@ -19,11 +19,18 @@ public class RolService {
     }
 
     public List<Rol> getAll(){
-        List<Rol> roles = rolRepository.getAllRoles();
-        if (roles.isEmpty()) {
-            throw new IllegalArgumentException("No se encontraron roles activos");
+        try {
+            
+            List<Rol> roles = rolRepository.getAllRoles();
+            if (roles.isEmpty()) {
+                throw new IllegalArgumentException("No se encontraron roles activos");
+            }
+            return roles;
+        } catch (RuntimeException ex) {
+             throw new IllegalArgumentException(ex.getMessage().toString(), ex.getCause());
+        } catch (Exception e) {
+             throw new IllegalArgumentException("Error " + e.getMessage().toString(), e.getCause());
         }
-        return roles;
         
     }
 

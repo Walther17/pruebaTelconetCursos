@@ -28,16 +28,16 @@ public class InscripcionesCursoController {
     InscripcionesCursoService inscripcionesCursoService;
  
      @GetMapping("/curso/{cursoId}")
-    public ResponseEntity<List<?>> obtenerTodasLasInscripcionesDeUnCurso(@PathVariable Integer cursoId) {
+    public ResponseEntity<?>obtenerTodasLasInscripcionesDeUnCurso(@PathVariable Integer cursoId) {
         try {
             List<InscripcionCurso> inscripciones = inscripcionesCursoService.getAllInscripcionesDeUnCurso(cursoId);
             return ResponseEntity.ok(inscripciones);
             
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-          return new ResponseEntity<>( HttpStatus.NOT_FOUND);
-      }
+        }catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage().toString(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/suscribir")

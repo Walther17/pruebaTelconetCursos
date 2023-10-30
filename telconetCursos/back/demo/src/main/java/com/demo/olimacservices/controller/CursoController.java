@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,15 +42,15 @@ public class CursoController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Curso>> listarCursos() {
+    public ResponseEntity<?> listarCursos() {
         try {
 
             List<Curso> cursos = cursoService.getAllCursos();
             return new ResponseEntity<>(cursos, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Mensaje(e.getMessage()),HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Mensaje(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -79,7 +80,7 @@ public class CursoController {
         }
     }
 
-    @PutMapping("/eliminar/{cursoId}")
+    @DeleteMapping  ("/eliminar/{cursoId}")
     public ResponseEntity<?> eliminarCurso(@PathVariable Integer cursoId) {
         try {
             Curso cursoEliminado = cursoService.eliminarCurso(cursoId);

@@ -41,4 +41,6 @@ public interface InscripcionesCursoRepository extends JpaRepository<InscripcionC
     @Query(value = "SELECT * FROM get_all_inscripciones();", nativeQuery = true)
     List<InscripcionCurso> getAllInscripciones();
 
+    
+
 }
