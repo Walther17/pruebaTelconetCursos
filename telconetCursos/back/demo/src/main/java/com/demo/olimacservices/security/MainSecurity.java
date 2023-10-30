@@ -61,6 +61,7 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/usuarios/**").permitAll()
+                .antMatchers("/roles/**").permitAll()
                 .antMatchers("/cursos/**").permitAll()
                 .antMatchers("/inscripcion/**").permitAll()
                 .anyRequest().authenticated()

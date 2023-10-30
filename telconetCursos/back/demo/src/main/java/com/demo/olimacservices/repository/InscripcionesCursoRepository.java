@@ -29,6 +29,10 @@ public interface InscripcionesCursoRepository extends JpaRepository<InscripcionC
     @Query(value = "SELECT * FROM cancelar_inscripcion(:p_inscripcion_id);", nativeQuery = true)
     InscripcionCurso anularSubscripcion(@Param("p_inscripcion_id") Integer inscripcionId);
 
+     @Transactional
+    @Query(value = "SELECT * FROM suscribirse_nuevamente(:p_inscripcion_id);", nativeQuery = true)
+    InscripcionCurso suscribirseDenuevo(@Param("p_inscripcion_id") Integer inscripcionId);
+
          
     @Query(value = "SELECT existe_inscripcion(:cursoId, :consumidorId)", nativeQuery = true)
     boolean existeInscripcion(@Param("cursoId") Integer cursoId, @Param("consumidorId") Integer consumidorId);

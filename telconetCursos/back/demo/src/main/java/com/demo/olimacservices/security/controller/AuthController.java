@@ -20,12 +20,8 @@ import com.demo.olimacservices.security.jwt.JwtProvider;
 import com.demo.olimacservices.security.repository.UsuarioRepository;
 import com.demo.olimacservices.security.service.RolService;
 import com.demo.olimacservices.security.service.UsuarioService;
-
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -51,56 +47,56 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
-    @PostMapping("/nuevo")
-    public ResponseEntity<?> nuevo(@Valid @RequestBody Usuario nuevoUsuario, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(new Mensaje("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
-        }
+    // @PostMapping("/nuevo")
+    // public ResponseEntity<?> nuevo(@Valid @RequestBody Usuario nuevoUsuario, BindingResult bindingResult) {
+    //     if (bindingResult.hasErrors()) {
+    //         return new ResponseEntity<>(new Mensaje("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
+    //     }
 
-        // if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario())) {
-        //     return new ResponseEntity<>(new Mensaje("Ese nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
-        // }
+    //     // if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario())) {
+    //     //     return new ResponseEntity<>(new Mensaje("Ese nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
+    //     // }
 
-        if (usuarioService.existsByEmail(nuevoUsuario.getEmail())) {
-            return new ResponseEntity<>(new Mensaje("Ese email ya existe"), HttpStatus.BAD_REQUEST);
-        }
+    //     if (usuarioService.existsByEmail(nuevoUsuario.getEmail())) {
+    //         return new ResponseEntity<>(new Mensaje("Ese email ya existe"), HttpStatus.BAD_REQUEST);
+    //     }
 
-        Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getApellido(),
-                 nuevoUsuario.getEmail(), nuevoUsuario.getEstado(),
-                passwordEncoder.encode(nuevoUsuario.getPassword()));
+    //     Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getApellido(),
+    //              nuevoUsuario.getEmail(), nuevoUsuario.getEstado(),
+    //             passwordEncoder.encode(nuevoUsuario.getPassword()));
 
-        Set<Rol> roles = new HashSet<>();
-        if (nuevoUsuario.getRoles().contains("ROLE_ADMIN")) {
-            Optional<Rol> rolAdminOptional = rolService.getByRolNombre(RolNombre.ROLE_ADMIN);
-            if (rolAdminOptional.isPresent()) {
-                roles.add(rolAdminOptional.get());
-            } else {
-                return new ResponseEntity<>(new Mensaje("El rol de administrador no está configurado"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } else if (nuevoUsuario.getRoles().contains("ROLE_CONSUMIDOR")){
-            Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CONSUMIDOR);
-            if (rolUserOptional.isPresent()) {
-                roles.add(rolUserOptional.get());
-            } else {
-                return new ResponseEntity<>(new Mensaje("El rol de usuario no está configurado"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }else {
-             Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CREADOR);
-            if (rolUserOptional.isPresent()) {
-                roles.add(rolUserOptional.get());
-            } else {
-                return new ResponseEntity<>(new Mensaje("El rol de usuario no está configurado"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        usuario.setRoles(roles);
-          usuarioService.save(usuario);
-        // usuarioRepository.insertarUsuario(usuario.getNombre(), usuario.getApellido(),
-        // usuario.getEmail(), usuario.getPassword(), usuario.getEstado());
-        return new ResponseEntity<>( usuario, HttpStatus.CREATED);
-    }
+    //     Set<Rol> roles = new HashSet<>();
+    //     if (nuevoUsuario.getRoles().contains("ROLE_ADMIN")) {
+    //         Optional<Rol> rolAdminOptional = rolService.getByRolNombre(RolNombre.ROLE_ADMIN);
+    //         if (rolAdminOptional.isPresent()) {
+    //             roles.add(rolAdminOptional.get());
+    //         } else {
+    //             return new ResponseEntity<>(new Mensaje("El rol de administrador no está configurado"),
+    //                     HttpStatus.INTERNAL_SERVER_ERROR);
+    //         }
+    //     } else if (nuevoUsuario.getRoles().contains("ROLE_CONSUMIDOR")){
+    //         Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CONSUMIDOR);
+    //         if (rolUserOptional.isPresent()) {
+    //             roles.add(rolUserOptional.get());
+    //         } else {
+    //             return new ResponseEntity<>(new Mensaje("El rol de usuario no está configurado"),
+    //                     HttpStatus.INTERNAL_SERVER_ERROR);
+    //         }
+    //     }else {
+    //          Optional<Rol> rolUserOptional = rolService.getByRolNombre(RolNombre.ROLE_CREADOR);
+    //         if (rolUserOptional.isPresent()) {
+    //             roles.add(rolUserOptional.get());
+    //         } else {
+    //             return new ResponseEntity<>(new Mensaje("El rol de usuario no está configurado"),
+    //                     HttpStatus.INTERNAL_SERVER_ERROR);
+    //         }
+    //     }
+    //     usuario.setRoles(roles);
+    //       usuarioService.save(usuario);
+    //     // usuarioRepository.insertarUsuario(usuario.getNombre(), usuario.getApellido(),
+    //     // usuario.getEmail(), usuario.getPassword(), usuario.getEstado());
+    //     return new ResponseEntity<>( usuario, HttpStatus.CREATED);
+    // }
 
     @PostMapping("/login")
     public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult) {
@@ -117,13 +113,5 @@ public class AuthController {
         return new ResponseEntity<JwtDto>(jwtDto, HttpStatus.OK);
     }
 
-    @GetMapping("/usuarios")
-    private List<Usuario> getAllUsers() {
-        return usuarioService.getAll();
-    }
-
-    @GetMapping("/roles")
-    private List<Rol> getAllRoles() {
-        return rolService.getAll();
-    }
+    
 }

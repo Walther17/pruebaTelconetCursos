@@ -28,44 +28,14 @@ public class UsuarioController {
 
   @Autowired
   UsuarioService usuarioService;
+  PasswordEncoder passwordEncoder;
 
-   @Autowired
-    PasswordEncoder passwordEncoder;
-
-  @GetMapping("/listar-usuarios")
-  public ResponseEntity<List<Usuario>> list() {
-    return ResponseEntity.ok(usuarioService.getAll());
-  }
-
-  @GetMapping("/detail/{id}")
-  public ResponseEntity<Usuario> getUsuariobyId(@PathVariable Integer id) {
-    Usuario usuario = usuarioService.getUsuarioById(id);
-    return ResponseEntity.ok(usuario);
-  }
-
-  @PreAuthorize("hasRole('ADMIN')")
-  @PutMapping("/delete/{id}")
-  public ResponseEntity<?> setEstadoNull(@Valid @PathVariable Integer id) {
-    usuarioService.setEstadoNull(id);
-    Map<String, Object> response = new HashMap<>(); // (Map) para construye el objeto JSON de respuesta.
-
-    response.put("success", true);
-    response.put("message", "Estado actualizado a null para el usuario con ID: " + id);
-
-    return ResponseEntity.ok(response); // devuelve una respuesta exitosa con el objeto JSON construido.
-  }
+   
+  // @PreAuthorize("hasRole('ADMIN')")
+   
 
   // @PreAuthorize("hasRole('ADMIN')")
-  // @PutMapping("update/{id}")
-  // public ResponseEntity<Usuario> updateUsuario(@Valid @RequestBody Usuario usuario, @PathVariable Integer id) {
-  //   return ResponseEntity.ok(usuarioService.updateUsuario(usuario, id));
-  // }
-
-  @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping("create")
-  public ResponseEntity<Usuario> saveUsuario(@Valid @RequestBody Usuario usuario) {
-    return ResponseEntity.ok(usuarioService.save2(usuario));
-  }
+   
 
   ////////////////////////////////
   @GetMapping("/{usuarioId}")
@@ -75,45 +45,56 @@ public class UsuarioController {
       return new ResponseEntity<>(usuario, HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(new Mensaje("El usuario que buscas no existe"), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
   }
 
-  @GetMapping("/todos")
-    public ResponseEntity<?> obtenerTodosLosUsuarios() {
-        try {
-            List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
-            return new ResponseEntity<>(usuarios, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new Mensaje("No se encontraron usuarios activos"), HttpStatus.NOT_FOUND);
-        }
+  @GetMapping("todos")
+  public ResponseEntity<?> obtenerTodosLosUsuarios() {
+    try {
+      List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
+      return new ResponseEntity<>(usuarios, HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(new Mensaje("No se encontraron usuarios activos"), HttpStatus.NOT_FOUND);
     }
+  }
 
-    @PutMapping("update/{usuarioId}")
-    public ResponseEntity<?> actualizarUsuario(
-        @PathVariable Integer usuarioId, @RequestBody Usuario usuario
-    ) {
-      try {
-             usuarioService.actualizarUsuario(usuarioId, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(), passwordEncoder.encode(usuario.getPassword()), usuario.getEstado());
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
+  @PostMapping("create")
+  public ResponseEntity<?> insertarUsuario(@Valid @RequestBody Usuario usuario) {
+    try {
+      Usuario newUsuario = usuarioService.crearUsuario(usuario); // Pasa el objeto Usuario completo
+      return new ResponseEntity<>(newUsuario, HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);
+    } catch (Exception e) {
+      return new ResponseEntity<>(new Mensaje("Error al crear el usuario"), HttpStatus.NOT_FOUND);
     }
+  }
 
-    
-    @PutMapping("/eliminar/{usuarioId}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer usuarioId) {
-        try {
-            usuarioService.eliminarUsuario(usuarioId);
-            return new ResponseEntity<>(new Mensaje("Usuario eliminado exitosamente"), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new Mensaje("Error interno del servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+  @PutMapping("eliminar/{usuarioId}")
+  public ResponseEntity<?> eliminarUsuario(@PathVariable Integer usuarioId) {
+    try {
+      usuarioService.eliminarUsuario(usuarioId);
+      return new ResponseEntity<>(new Mensaje("Usuario eliminado exitosamente"), HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(new Mensaje("Error interno del servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
 
+  @PutMapping("update/{usuarioId}")
+  public ResponseEntity<?> actualizarUsuario(@PathVariable Integer usuarioId, @RequestBody Usuario usuario) {
+    try {
+      usuarioService.actualizarUsuario(usuarioId, usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),
+          passwordEncoder.encode(usuario.getPassword()), usuario.getEstado());
+      return new ResponseEntity<>(usuario, HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);
+    } catch (Exception e) {
+      return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+  }
 
 }

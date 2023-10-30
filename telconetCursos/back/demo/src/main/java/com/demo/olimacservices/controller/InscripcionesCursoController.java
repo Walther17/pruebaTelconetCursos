@@ -1,6 +1,9 @@
 package com.demo.olimacservices.controller;
 
 import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +28,7 @@ public class InscripcionesCursoController {
     InscripcionesCursoService inscripcionesCursoService;
  
      @GetMapping("/curso/{cursoId}")
-    public ResponseEntity<List<InscripcionCurso>> obtenerTodasLasInscripcionesDeUnCurso(@PathVariable Integer cursoId) {
+    public ResponseEntity<List<?>> obtenerTodasLasInscripcionesDeUnCurso(@PathVariable Integer cursoId) {
         try {
             List<InscripcionCurso> inscripciones = inscripcionesCursoService.getAllInscripcionesDeUnCurso(cursoId);
             return ResponseEntity.ok(inscripciones);
@@ -38,7 +41,7 @@ public class InscripcionesCursoController {
     }
 
     @PostMapping("/suscribir")
-    public ResponseEntity<?> suscribirUsuarioACurso(@RequestBody InscripcionCurso request) {
+    public ResponseEntity<?> suscribirUsuarioACurso(@Valid @RequestBody InscripcionCurso request) {
         try {
             InscripcionCurso inscripcion = inscripcionesCursoService.suscribirUsuarioACurso(request.getCurso(), request.getConsumidor());
             return ResponseEntity.ok(inscripcion);
@@ -62,6 +65,18 @@ public class InscripcionesCursoController {
           return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
       }
     }
+    @PutMapping("/again/{inscripcionId}")
+    public ResponseEntity<?> suscribirseDenuevo(@PathVariable Integer inscripcionId) {
+        try {
+            InscripcionCurso inscripcion = inscripcionesCursoService.suscribirseNuevamente(inscripcionId);
+            return ResponseEntity.ok(inscripcion);
+            
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
+          return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
+      }
+    }
 
 
    /////////
@@ -76,9 +91,9 @@ public class InscripcionesCursoController {
     }
 
     @GetMapping("/{inscripcionId}")
-    public ResponseEntity<?> obtenerTodasLasInscripcionesById(@PathVariable Integer inscripcionId) {
+    public ResponseEntity<?> obtenerInscripcionesById(@PathVariable Integer inscripcionId) {
         try {
-              InscripcionCurso inscripciones = inscripcionesCursoService.getAllInscripcionesById(inscripcionId);
+              InscripcionCurso inscripciones = inscripcionesCursoService.getInscripcionesById(inscripcionId);
             return ResponseEntity.ok(inscripciones);
         }  catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);

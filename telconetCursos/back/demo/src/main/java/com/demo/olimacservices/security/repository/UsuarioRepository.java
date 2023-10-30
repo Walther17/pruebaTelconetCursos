@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.demo.olimacservices.security.entity.Rol;
 import com.demo.olimacservices.security.entity.Usuario;
 
 import java.util.List;
@@ -19,13 +20,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     Optional<Usuario> findByEmail(String email);
 
+ 
     @Query("SELECT u FROM Usuario u WHERE u.id = :id AND u.estado = 'A' ")
     public Usuario getUsuarioById(Integer id);
 
     // boolean existsByNombreUsuario(String nombreUsuario);
 
-    boolean existsByEmail(String email);
-
+    
     @Query("SELECT u FROM Usuario u WHERE u.estado = 'A'")
     public List<Usuario> getAllUsers();
 
@@ -33,16 +34,24 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Modifying
     @Query("UPDATE Usuario u SET u.estado = null WHERE u.id = ?1 ")
     public void setEstadoNull(Integer id);
-
+    
 
     /////////////////////////////////////////////////////
+    
+    boolean existsByEmail(String email);
+    boolean existsById(Integer id);
+
+
+    @Query(value = "SELECT * FROM buscar_rol_por_nombre(:p_rol_nombre)", nativeQuery = true)
+    public Rol buscarRolPorNombre(@Param("p_rol_nombre") String rolNombre);
+
 
     @Query(value = "SELECT * FROM insertar_usuario(:nombre, :apellido, :email, :password, :estado);", nativeQuery = true)
     public Usuario insertarUsuario(
-            @Param("nombre") String nombre, 
-            @Param("apellido") String apellido, 
-            @Param("email") String email, 
-            @Param("password") String password,
+        @Param("nombre") String nombre, 
+        @Param("apellido") String apellido, 
+        @Param("email") String email, 
+        @Param("password") String password,
             @Param("estado") String estado);
     
     @Query(value = "SELECT * FROM obtener_usuario_por_id(:p_usuario_id)", nativeQuery = true)

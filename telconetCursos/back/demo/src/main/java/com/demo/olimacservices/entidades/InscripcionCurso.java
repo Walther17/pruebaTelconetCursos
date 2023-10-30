@@ -11,10 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-
 import com.demo.olimacservices.security.entity.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data
@@ -29,13 +26,13 @@ public class InscripcionCurso {
     @JoinColumn(name = "curso_id")
     private Curso curso;
 
-    //  @CreatedDate
-    // @Column(name = "fe_creacion", nullable = false, updatable = false)
-    // private LocalDateTime feCreacion;
+    @CreatedDate
+    @Column(name = "fe_creacion", nullable = false, updatable = false)
+    private LocalDateTime feCreacion;
 
-    // @LastModifiedDate
-    // @Column(name = "fe_actualizacion")
-    // private LocalDateTime feActualizacion;
+    @LastModifiedDate
+    @Column(name = "fe_actualizacion")
+    private LocalDateTime feActualizacion;
 
     @ManyToOne
     @JoinColumn(name = "consumidor_id")

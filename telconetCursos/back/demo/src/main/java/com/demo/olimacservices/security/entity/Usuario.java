@@ -74,13 +74,13 @@ public class Usuario {
     @Pattern(regexp = "[AI]", message = "El campo estado solo puede tener los valores: A Activo, I Inactivo")
     private String estado;
 
-    // @CreatedDate
-    // @Column(name = "fe_creacion", nullable = false, updatable = false)
-    // private LocalDateTime feCreacion;
+    @CreatedDate
+    @Column(name = "fe_creacion", nullable = false, updatable = false)
+    private LocalDateTime feCreacion;
 
-    // @LastModifiedDate
-    // @Column(name = "fe_actualizacion")
-    // private LocalDateTime feActualizacion;
+    @LastModifiedDate
+    @Column(name = "fe_actualizacion")
+    private LocalDateTime feActualizacion;
 
     @NotNull
     @ManyToMany(fetch = FetchType.EAGER)

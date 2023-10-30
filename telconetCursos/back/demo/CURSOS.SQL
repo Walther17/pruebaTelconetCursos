@@ -1,49 +1,92 @@
 
- SELECT * from rol;
-	SELECT * from usuario;
-    SELECT * from usuario_rol;
-
+SELECT * from rol;
+SELECT * from usuario;
+SELECT * from usuario_rol;
 
 ---------------------ROLES----------------------
 -- funcion para retornar los roles
 DROP FUNCTION obtener_roles()
 --
-CREATE OR REPLACE FUNCTION obtener_roles()
-RETURNS TABLE (
-    id INT,
-    rol_nombre VARCHAR,
-    fe_creacion TIMESTAMP,
-    fe_actualizacion TIMESTAMP,
-    estado VARCHAR
-) AS $$
+CREATE OR REPLACE FUNCTION get_All_Roles() 
+RETURNS SETOF rol AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        r.id,
-        r.rol_nombre,
-        r.fe_creacion,
-        r.fe_actualizacion,
-        r.estado
-    FROM
-        rol r;
+    SELECT * FROM rol WHERE estado = 'A';
 END;
 $$ LANGUAGE plpgsql;
 
 --
 SELECT * FROM obtener_roles();
+-----------ROLES
 
 -- INSERTAR ROLES
+ 
+----
+	 CREATE OR REPLACE FUNCTION crear_rol(
+		p_nombre VARCHAR,
+		p_estado VARCHAR
+	) RETURNS rol AS $$
+	DECLARE
+		new_rol rol;
+	BEGIN
+		INSERT INTO rol (rol_nombre, estado, fe_creacion, fe_actualizacion)
+		VALUES (p_nombre, p_estado, now(), now())
+		RETURNING * INTO new_rol;
 
-INSERT INTO rol (rol_nombre, fe_creacion, fe_actualizacion, estado)
-VALUES ('ROLE_ADMIN', NOW(), NOW(), 'A');
-
-INSERT INTO rol (rol_nombre, fe_creacion, fe_actualizacion, estado)
-VALUES ('ROLE_CREADOR', NOW(), NOW(), 'A');
-
-INSERT INTO rol (rol_nombre, fe_creacion, fe_actualizacion, estado)
-VALUES ('ROLE_CONSUMIDOR', NOW(), NOW(), 'A');
+		RETURN new_rol;
+	END;
+	$$ LANGUAGE plpgsql;
 
 
+	SELECT * FROM crear_rol('ROLE_ADMIN', 'A');
+-------------
+CREATE OR REPLACE FUNCTION actualizar_rol(
+    p_rol_id INT,
+    p_nombre VARCHAR,
+    p_estado VARCHAR
+) RETURNS rol AS $$
+DECLARE
+    rol_actualizado rol;
+BEGIN
+    UPDATE rol
+    SET
+        rol_nombre = p_nombre,
+        estado = p_estado,
+		 fe_actualizacion = NOW() 	
+    WHERE id = p_rol_id
+    RETURNING * INTO rol_actualizado;
+
+    RETURN rol_actualizado;
+END;
+$$ LANGUAGE plpgsql;
+---
+CREATE OR REPLACE FUNCTION eliminar_rol(p_rol_id INT)
+RETURNS rol AS $$
+DECLARE
+    rol_eliminado rol;
+BEGIN
+    UPDATE rol
+    SET estado = 'I'
+    WHERE id = p_rol_id
+
+    RETURNING * INTO rol_eliminado;
+
+    RETURN rol_eliminado;
+END;
+$$ LANGUAGE plpgsql;
+-----
+CREATE OR REPLACE FUNCTION buscar_rol_por_nombre(p_rol_nombre VARCHAR) RETURNS rol AS $$
+DECLARE
+    rol_encontrado rol;
+BEGIN
+    SELECT * INTO rol_encontrado FROM rol WHERE rol_nombre = p_rol_nombre;
+    RETURN rol_encontrado;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+select * from buscar_rol_por_nombre('ROLE_ADMIN');
+----------
 --------------------------USUARIOS---------------------
 drop function insertar_usuario()
 --- crear usuario
@@ -64,7 +107,8 @@ BEGIN
     RETURN new_user;
 END;
 $$ LANGUAGE plpgsql;
-
+------
+SELECT * FROM insertar_usuario('Walther', 'Olivo', 'walther_olivo@gmail.com', 'xdd', 'A');
 ------------ obtener_usuario_por_id
 CREATE OR REPLACE FUNCTION obtener_usuario_por_id(p_usuario_id INT) 
 RETURNS usuario AS $$
@@ -93,7 +137,8 @@ BEGIN
         apellido = p_apellido,
         email = p_email,
         password = p_password,
-        estado = p_estado
+        estado = p_estado,
+         fe_actualizacion = NOW() 	
     WHERE id = p_usuario_id
     RETURNING * INTO usuario_actualizado;
 
@@ -136,8 +181,8 @@ CREATE OR REPLACE FUNCTION crear_curso(
 DECLARE
     new_curso curso;
 BEGIN
-    INSERT INTO curso (nombre, creador_id, estado)
-    VALUES (p_nombre, p_creador_id, 'A')
+    INSERT INTO curso (nombre, creador_id, estado, fe_creacion, fe_actualizacion)
+    VALUES (p_nombre, p_creador_id, 'A', now(), now())
     RETURNING * INTO new_curso;
 
     RETURN new_curso;
@@ -189,7 +234,7 @@ DECLARE
     curso_actualizado curso;
 BEGIN
     UPDATE curso 
-    SET nombre = p_curso_nombre, estado = p_estado 
+    SET nombre = p_curso_nombre, estado = p_estado ,fe_actualizacion = NOW() 	
     WHERE id = p_curso_id
 
      RETURNING * INTO curso_actualizado;
@@ -208,8 +253,8 @@ CREATE OR REPLACE FUNCTION crear_inscripcion_curso(
 DECLARE
     new_inscripcion inscripcion_curso;
 BEGIN
-    INSERT INTO inscripcion_curso (curso_id, consumidor_id, activo)
-    VALUES (p_curso_id, p_consumidor_id, false)
+    INSERT INTO inscripcion_curso (curso_id, consumidor_id, activo, fe_creacion, fe_actualizacion)
+    VALUES (p_curso_id, p_consumidor_id, true, now(), now())
     RETURNING * INTO new_inscripcion;
 
     RETURN new_inscripcion;
@@ -245,13 +290,13 @@ END;
 $$ LANGUAGE plpgsql;
 -----
 ---- eliminar 
-CREATE OR REPLACE FUNCTION cancelar_inscripcion(  p_inscripcion_id INT)
+CREATE OR REPLACE FUNCTION cancelar_inscripcion(p_inscripcion_id INT)
 RETURNS inscripcion_curso AS $$
 DECLARE
     anular_inscripcion inscripcion_curso;
 BEGIN
     UPDATE inscripcion_curso
-    SET activo = true
+    SET activo = false, fe_actualizacion = NOW() 	
     WHERE id = p_inscripcion_id
     RETURNING * INTO anular_inscripcion;
 
@@ -279,24 +324,367 @@ CREATE OR REPLACE FUNCTION get_all_inscripciones()
 RETURNS SETOF inscripcion_curso AS $$
 BEGIN
     RETURN QUERY
-    SELECT * FROM usuario WHERE estado = 'A';
+    SELECT * FROM inscripcion_curso WHERE activo = true;
 END;
 $$ LANGUAGE plpgsql;
 --
 
 CREATE OR REPLACE FUNCTION suscribirse_nuevamente(
-      p_consumidor_id INT
+      p_inscripcion_id INT
 )
 RETURNS inscripcion_curso AS $$
 DECLARE
     inscribirse_nuevamente inscripcion_curso;
 BEGIN
     UPDATE inscripcion_curso 
-    SET activo = false 
-    WHERE consumidor_id = p_consumidor_id
+    SET activo = true ,fe_actualizacion = NOW() 	
+    WHERE id = p_inscripcion_id
 
      RETURNING * INTO inscribirse_nuevamente;
 
     RETURN inscribirse_nuevamente;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-------------------------------------------------------
+--- PORSIACASO ALGO SALE MAL 
+-------------------------------------------------------
+select * from usuario;
+select * from rol;
+select * from inscripcion_curso;
+SELECT * FROM usuario_rol;
+insert into usuario_rol (usuario_id, rol_id) values (2,3);
+
+ CREATE OR REPLACE FUNCTION asignar_rol(
+		p_usuario_id INT,
+		p_rol_id INT
+	) RETURNS usuario_rol AS $$
+	DECLARE
+		new_asing rol;
+	BEGIN
+		INSERT INTO usuario_rol (usuario_id, rol_id)
+		VALUES (p_usuario_id, p_rol_id)
+		RETURNING * INTO new_asing;
+
+		RETURN new_asing;
+	END;
+	$$ LANGUAGE plpgsql;
+	
+	---
+	
+	-----
+CREATE OR REPLACE FUNCTION buscar_rol_por_nombre(p_rol_nombre VARCHAR) RETURNS rol AS $$
+DECLARE
+    rol_encontrado rol;
+BEGIN
+    SELECT * INTO rol_encontrado FROM rol WHERE rol_nombre = p_rol_nombre;
+    RETURN rol_encontrado;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+select * from buscar_rol_por_nombre('ROLE_ADMIN');
+----------
+CREATE OR REPLACE FUNCTION get_All_Roles() 
+RETURNS SETOF rol AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM rol WHERE estado = 'A';
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_All_Roles();
+---------------------
+	 CREATE OR REPLACE FUNCTION crear_rol(
+		p_nombre VARCHAR,
+		p_estado VARCHAR
+	) RETURNS rol AS $$
+	DECLARE
+		new_rol rol;
+	BEGIN
+		INSERT INTO rol (rol_nombre, estado, fe_creacion, fe_actualizacion)
+		VALUES (p_nombre, p_estado, now(), now())
+		RETURNING * INTO new_rol;
+
+		RETURN new_rol;
+	END;
+	$$ LANGUAGE plpgsql;
+
+	SELECT * FROM crear_rol('ROLE_ADMIN', 'A');
+--------------------
+CREATE OR REPLACE FUNCTION actualizar_rol(
+    p_rol_id INT,
+    p_nombre VARCHAR,
+    p_estado VARCHAR
+) RETURNS rol AS $$
+DECLARE
+    rol_actualizado rol;
+BEGIN
+    UPDATE rol
+    SET
+        rol_nombre = p_nombre,
+        estado = p_estado,
+		 fe_actualizacion = NOW() 	
+    WHERE id = p_rol_id
+    RETURNING * INTO rol_actualizado;
+
+    RETURN rol_actualizado;
+END;
+$$ LANGUAGE plpgsql;
+---
+CREATE OR REPLACE FUNCTION eliminar_rol(p_rol_id INT)
+RETURNS rol AS $$
+DECLARE
+    rol_eliminado rol;
+BEGIN
+    UPDATE rol
+    SET estado = 'I'
+    WHERE id = p_rol_id
+
+    RETURNING * INTO rol_eliminado;
+
+    RETURN rol_eliminado;
+END;
+$$ LANGUAGE plpgsql;
+		
+--------
+
+ CREATE OR REPLACE FUNCTION insertar_usuario(
+    p_nombre VARCHAR,
+    p_apellido VARCHAR,
+    p_email VARCHAR,
+    p_password VARCHAR,
+    p_estado VARCHAR
+) RETURNS usuario AS $$
+DECLARE
+    new_user usuario;
+BEGIN
+    INSERT INTO usuario (nombre, apellido, email, password, estado, fe_creacion, fe_actualizacion)
+    VALUES (p_nombre, p_apellido, p_email, p_password, p_estado, now(), now())
+    RETURNING * INTO new_user;
+
+    RETURN new_user;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM insertar_usuario('Walther', 'Olivo', 'walther@gmail.com', 'xdd', 'A');
+
+CREATE OR REPLACE FUNCTION obtener_todos_los_usuarios() 
+RETURNS SETOF usuario AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM usuario WHERE estado = 'A';
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM obtener_todos_los_usuarios();
+
+
+CREATE OR REPLACE FUNCTION obtener_usuario_por_id(p_usuario_id INT) 
+RETURNS usuario AS $$
+DECLARE
+    usuario_encontrado usuario;
+BEGIN
+    SELECT * INTO usuario_encontrado FROM usuario WHERE id = p_usuario_id;
+    RETURN usuario_encontrado;
+END;
+$$ LANGUAGE plpgsql;
+------------------------------------
+---
+CREATE OR REPLACE FUNCTION actualizar_usuario(
+    p_usuario_id INT,
+    p_nombre VARCHAR,
+    p_apellido VARCHAR,
+    p_email VARCHAR,
+    p_password VARCHAR,
+    p_estado VARCHAR
+) RETURNS usuario AS $$
+DECLARE
+    usuario_actualizado usuario;
+BEGIN
+    UPDATE usuario
+    SET
+        nombre = p_nombre,
+        apellido = p_apellido,
+        email = p_email,
+        password = p_password,
+        estado = p_estado,
+        fe_actualizacion = NOW() 	
+    WHERE id = p_usuario_id
+    RETURNING * INTO usuario_actualizado;
+
+    RETURN usuario_actualizado;
+END;
+$$ LANGUAGE plpgsql;
+-----
+CREATE OR REPLACE FUNCTION eliminar_usuario(p_usuario_id INT)
+RETURNS usuario AS $$
+DECLARE
+    usuario_eliminado usuario;
+BEGIN
+    UPDATE usuario
+    SET estado = 'I'
+    WHERE id = p_usuario_id
+
+     RETURNING * INTO usuario_eliminado;
+
+    RETURN usuario_eliminado;
+END;
+$$ LANGUAGE plpgsql;
+----
+CREATE OR REPLACE FUNCTION getAllcursos()
+RETURNS SETOF curso AS $$
+BEGIN
+    RETURN QUERY SELECT * FROM curso WHERE estado = 'A';
+END;
+$$ LANGUAGE plpgsql;
+----------
+CREATE OR REPLACE FUNCTION crear_curso(
+    p_nombre VARCHAR,
+    p_creador_id INT,
+    p_estado VARCHAR
+) RETURNS curso AS $$
+DECLARE
+    new_curso curso;
+BEGIN
+    INSERT INTO curso (nombre, creador_id, estado, fe_creacion, fe_actualizacion)
+    VALUES (p_nombre, p_creador_id, 'A', now(), now())
+    RETURNING * INTO new_curso;
+
+    RETURN new_curso;
+END;
+$$ LANGUAGE plpgsql;
+-----------
+CREATE OR REPLACE FUNCTION update_curso(
+    p_curso_id INT,
+    p_curso_nombre VARCHAR,
+    p_estado VARCHAR)
+RETURNS curso AS $$
+DECLARE
+    curso_actualizado curso;
+BEGIN
+    UPDATE curso 
+    SET nombre = p_curso_nombre, estado = p_estado , fe_actualizacion = NOW() 	
+    WHERE id = p_curso_id
+
+     RETURNING * INTO curso_actualizado;
+
+    RETURN curso_actualizado;
+END;
+$$ LANGUAGE plpgsql;
+------------
+CREATE OR REPLACE FUNCTION eliminar_curso(p_curso_id INT)
+RETURNS curso AS $$
+DECLARE
+    curso_eliminado curso;
+BEGIN
+    UPDATE curso
+    SET estado = 'I'
+    WHERE id = p_curso_id
+
+     RETURNING * INTO curso_eliminado;
+
+    RETURN curso_eliminado;
+END;
+$$ LANGUAGE plpgsql;
+----
+CREATE OR REPLACE FUNCTION obtener_curso_por_id(p_curso_id INT)
+RETURNS curso AS $$
+DECLARE
+    curso_rec curso;
+BEGIN
+    SELECT * INTO curso_rec FROM curso WHERE id = p_curso_id;
+    RETURN curso_rec;
+END;
+$$ LANGUAGE plpgsql;
+------------------
+CREATE OR REPLACE FUNCTION crear_inscripcion_curso(
+    p_curso_id INT,
+    p_consumidor_id INT
+) RETURNS inscripcion_curso AS $$
+DECLARE
+    new_inscripcion inscripcion_curso;
+BEGIN
+    INSERT INTO inscripcion_curso (curso_id, consumidor_id, activo, fe_creacion, fe_actualizacion)
+    VALUES (p_curso_id, p_consumidor_id, true, now(), now())
+    RETURNING * INTO new_inscripcion;
+
+    RETURN new_inscripcion;
+END;
+$$ LANGUAGE plpgsql;
+---
+CREATE OR REPLACE FUNCTION obtener_inscripciones_de_curso(p_curso_id INT)
+RETURNS SETOF inscripcion_curso AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM inscripcion_curso
+    WHERE curso_id = p_curso_id;
+END;
+$$ LANGUAGE plpgsql;
+----
+CREATE OR REPLACE FUNCTION obtener_inscripcion_por_id(p_inscripcion_id INT)
+RETURNS inscripcion_curso AS $$
+DECLARE
+    inscripcion inscripcion_curso;
+BEGIN
+    SELECT *
+    INTO inscripcion
+    FROM inscripcion_curso
+    WHERE id = p_inscripcion_id;
+
+    RETURN inscripcion;
+END;
+$$ LANGUAGE plpgsql;
+--
+CREATE OR REPLACE FUNCTION cancelar_inscripcion(p_inscripcion_id INT)
+RETURNS inscripcion_curso AS $$
+DECLARE
+    anular_inscripcion inscripcion_curso;
+BEGIN
+    UPDATE inscripcion_curso
+    SET activo = false, fe_actualizacion = NOW() 	
+    WHERE id = p_inscripcion_id
+    RETURNING * INTO anular_inscripcion;
+
+    RETURN anular_inscripcion;
+END;
+$$ LANGUAGE plpgsql;
+---
+
+CREATE OR REPLACE FUNCTION suscribirse_nuevamente(
+      p_inscripcion_id INT
+)
+RETURNS inscripcion_curso AS $$
+DECLARE
+    inscribirse_nuevamente inscripcion_curso;
+BEGIN
+    UPDATE inscripcion_curso 
+    SET activo = true ,fe_actualizacion = NOW() 	
+    WHERE id = p_inscripcion_id
+
+     RETURNING * INTO inscribirse_nuevamente;
+
+    RETURN inscribirse_nuevamente;
+END;
+$$ LANGUAGE plpgsql;
+---
+CREATE OR REPLACE FUNCTION get_all_inscripciones() 
+RETURNS SETOF inscripcion_curso AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM inscripcion_curso WHERE activo = true;
+END;
+$$ LANGUAGE plpgsql;
+--
+CREATE OR REPLACE FUNCTION existe_inscripcion(p_curso_id INT, p_consumidor_id INT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM inscripcion_curso WHERE curso_id = p_curso_id AND consumidor_id = p_consumidor_id) THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
