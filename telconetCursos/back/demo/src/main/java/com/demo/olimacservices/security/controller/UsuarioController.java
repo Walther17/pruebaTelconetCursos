@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +58,8 @@ public class UsuarioController {
       return new ResponseEntity<>(usuarios, HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(new Mensaje("No se encontraron usuarios activos"), HttpStatus.NOT_FOUND);
+    }catch (Exception e) {
+      return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
     }
   }
 
@@ -72,7 +75,7 @@ public class UsuarioController {
     }
   }
 
-  @PutMapping("eliminar/{usuarioId}")
+  @DeleteMapping("eliminar/{usuarioId}")
   public ResponseEntity<?> eliminarUsuario(@PathVariable Integer usuarioId) {
     try {
       usuarioService.eliminarUsuario(usuarioId);

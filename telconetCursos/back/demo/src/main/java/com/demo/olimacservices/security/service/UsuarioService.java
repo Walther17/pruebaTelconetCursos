@@ -22,7 +22,11 @@ public class UsuarioService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
     RolRepository rolRepository;
 
 
@@ -40,11 +44,18 @@ public class UsuarioService {
     }
 
     public List<Usuario> obtenerTodosLosUsuarios() {
-        List<Usuario> usuarios = usuarioRepository.getAllUsuarios();
-        if (usuarios.isEmpty()) {
-            throw new IllegalArgumentException("No se encontraron usuarios activos");
+        try {
+            
+            List<Usuario> usuarios = usuarioRepository.getAllUsuarios();
+            if (usuarios.isEmpty()) {
+                throw new IllegalArgumentException("No se encontraron usuarios activos");
+            }
+            return usuarios;
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
         }
-        return usuarios;
     }
 
     public Usuario actualizarUsuario(Integer id, String nombre, String apellido, String email, String password, String estado) {
@@ -99,14 +110,15 @@ public class UsuarioService {
                 nuevoUsuario.getApellido(),
                 nuevoUsuario.getEmail(),
                 nuevoUsuario.getEstado(),
-                passwordEncoder.encode(nuevoUsuario.getPassword())
+              passwordEncoder.encode(nuevoUsuario.getPassword())
+              //  nuevoUsuario.getPassword()
             );
     
             Set<Rol> roles = new HashSet<>();
     
             for (Rol rol : nuevoUsuario.getRoles()) {
                 String rolNombre = rol.getRolNombre(); // Obtén el nombre del rol
-                Rol rolEnBaseDeDatos = usuarioRepository.buscarRolPorNombre(rolNombre);
+                Rol rolEnBaseDeDatos = rolRepository.findByRolNombre(rolNombre);
                 if (rolEnBaseDeDatos != null) {
                     roles.add(rolEnBaseDeDatos);
                 } else {
@@ -115,6 +127,7 @@ public class UsuarioService {
             }
     
             usuario.setRoles(roles);
+            System.out.println(roles);
     
             return usuarioRepository.insertarUsuario(
                 usuario.getNombre(),

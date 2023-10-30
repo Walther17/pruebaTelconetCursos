@@ -1,5 +1,6 @@
 package com.demo.olimacservices.security.service;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     // UsuarioService se encarga de convertir la clase usuario en la clase principal, dicha clase es la que utiliza SSC para mostrar la info según los roles
     @Autowired
+    @Lazy
     UsuarioService usuarioService;
 
     @Override

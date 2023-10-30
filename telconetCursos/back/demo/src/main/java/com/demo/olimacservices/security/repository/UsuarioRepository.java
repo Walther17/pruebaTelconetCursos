@@ -24,11 +24,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByEmail(String email);
     boolean existsById(Integer id);
 
-
-    @Query(value = "SELECT * FROM buscar_rol_por_nombre(:p_rol_nombre)", nativeQuery = true)
-    public Rol buscarRolPorNombre(@Param("p_rol_nombre") String rolNombre);
-
-
     @Query(value = "SELECT * FROM insertar_usuario(:nombre, :apellido, :email, :password, :estado);", nativeQuery = true)
     public Usuario insertarUsuario(
         @Param("nombre") String nombre, 
