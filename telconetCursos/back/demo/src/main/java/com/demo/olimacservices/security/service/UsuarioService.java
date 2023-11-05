@@ -148,6 +148,41 @@ public class UsuarioService {
    
     
 
+    // public Usuario crearUsuarioConRol(Usuario nuevoUsuario) {
+    //     try {
+    //         if (usuarioRepository.existsByEmail(nuevoUsuario.getEmail())) {
+    //             throw new IllegalArgumentException("El email que ingresaste ya existe.");
+    //         }
+    //         if (nuevoUsuario.getNombre().isEmpty()) {
+    //             throw new IllegalArgumentException("El nombre no puede ser vacío.");
+    //         }
+    //         if (nuevoUsuario.getApellido().isEmpty()) {
+    //             throw new IllegalArgumentException("El apellido no puede ser vacío.");
+    //         }
+    //         if (nuevoUsuario.getPassword().isEmpty()) {
+    //             throw new IllegalArgumentException("La contraseña no puede ser vacía.");
+    //         }
+    //         if (nuevoUsuario.getEstado().isEmpty()) {
+    //             throw new IllegalArgumentException("El estado no puede ser vacío.");
+    //         }
+    
+    //         String hashedPassword = passwordEncoder.encode(nuevoUsuario.getPassword());
+            
+    //         return usuarioRepository.crearUsuarioConRol(
+    //             nuevoUsuario.getNombre(),
+    //             nuevoUsuario.getApellido(),
+    //             nuevoUsuario.getEmail(),
+    //             hashedPassword,
+    //             nuevoUsuario.getEstado(),
+    //             nuevoUsuario.getRoles().iterator().next().getRolNombre().toString()
+    //         );
+    //     } catch (IllegalArgumentException ex) {
+    //         throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
+    //     } catch (Exception e) {
+    //         throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
+    //     }
+    // }
+
     public Usuario crearUsuarioConRol(Usuario nuevoUsuario) {
         try {
             if (usuarioRepository.existsByEmail(nuevoUsuario.getEmail())) {
@@ -167,21 +202,28 @@ public class UsuarioService {
             }
     
             String hashedPassword = passwordEncoder.encode(nuevoUsuario.getPassword());
-            
+    
+            Optional<Rol> optionalRol = nuevoUsuario.getRoles()
+                .stream()
+                .findFirst();
+    
+            Rol rol = optionalRol.orElse(null); // Valor predeterminado null si no se encuentra un rol
+    
             return usuarioRepository.crearUsuarioConRol(
                 nuevoUsuario.getNombre(),
                 nuevoUsuario.getApellido(),
                 nuevoUsuario.getEmail(),
                 hashedPassword,
                 nuevoUsuario.getEstado(),
-                nuevoUsuario.getRoles().iterator().next().getRolNombre().toString()
+                rol != null ? rol.getRolNombre().toString() : RolNombre.ROLE_CONSUMIDOR.toString()
             );
-        } catch (IllegalArgumentException ex) {
+        } catch (RuntimeException ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
         } catch (Exception e) {
             throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
         }
     }
+    
     
 }
 
