@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.demo.olimacservices.security.entity.Rol;
+import com.demo.olimacservices.security.enums.RolNombre;
 import com.demo.olimacservices.security.repository.RolRepository;
 import java.util.List;
+import java.util.Optional;
  
 @Service
 @Transactional
@@ -14,8 +16,14 @@ public class RolService {
     @Autowired
     RolRepository rolRepository;
 
-    public Rol getByRolNombre(String rolNombre){
-        return rolRepository.findByRolNombre(rolNombre);
+    public Optional<Rol>  getByRolNombre(RolNombre rolNombre){
+        try {
+            return rolRepository.findByRolNombre(rolNombre);
+        } catch (RuntimeException ex) {
+             throw new IllegalArgumentException(ex.getMessage().toString(), ex.getCause());
+        } catch (Exception e) {
+             throw new IllegalArgumentException("Error " + e.getMessage().toString(), e.getCause());
+        }
     }
 
     public List<Rol> getAll(){
@@ -34,7 +42,7 @@ public class RolService {
         
     }
 
-     public Rol actualizarRol(Integer id, String nombre, String estado) {
+     public Rol actualizarRol(Integer id, RolNombre nombre, String estado) {
     
         try {
              if(!rolRepository.existsById(id)){
@@ -49,13 +57,13 @@ public class RolService {
         }
     }
 
-    public Rol crearRol(String nombre, String estado) {
+    public Rol crearRol(RolNombre nombre, String estado) {
     
         try {
             if(rolRepository.existsByRolNombre(nombre)){
              throw new IllegalArgumentException("El nombre del rol ya existe.");
              }
-             if (nombre.isEmpty()){
+             if (nombre == null){
              throw new IllegalArgumentException("El nombre del rol no puede ser vacío.");
             } if (estado.isEmpty()){
              throw new IllegalArgumentException("El estado del rol no puede ser vacío.");

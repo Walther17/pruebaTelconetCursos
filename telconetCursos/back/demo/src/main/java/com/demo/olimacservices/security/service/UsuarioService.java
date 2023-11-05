@@ -6,15 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.demo.olimacservices.security.entity.Rol;
 import com.demo.olimacservices.security.entity.Usuario;
+import com.demo.olimacservices.security.enums.RolNombre;
 import com.demo.olimacservices.security.repository.RolRepository;
 import com.demo.olimacservices.security.repository.UsuarioRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.management.RuntimeErrorException;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -63,7 +65,7 @@ public class UsuarioService {
             if (!usuarioRepository.existsById(id)) {
                 throw new IllegalArgumentException("El id no existe.");
             }
-              // password = passwordEncoder.encode(password);
+               password = passwordEncoder.encode(password);
     
             return usuarioRepository.actualizarUsuario(id, nombre, apellido, email, password, estado);
         } catch (RuntimeException ex) {
@@ -87,7 +89,66 @@ public class UsuarioService {
         }
     }
 
-    public Usuario crearUsuario(Usuario nuevoUsuario) {
+    // public Usuario crearUsuario(Usuario nuevoUsuario) {
+    //     try {
+    //         if (usuarioRepository.existsByEmail(nuevoUsuario.getEmail())) {
+    //             throw new IllegalArgumentException("El email que ingresaste ya existe.");
+    //         }
+    //         if (nuevoUsuario.getNombre().isEmpty()) {
+    //             throw new IllegalArgumentException("El nombre no puede ser vacío.");
+    //         }
+    //         if (nuevoUsuario.getApellido().isEmpty()) {
+    //             throw new IllegalArgumentException("El apellido no puede ser vacío.");
+    //         }
+    //         if (nuevoUsuario.getPassword().isEmpty()) {
+    //             throw new IllegalArgumentException("La contraseña no puede ser vacía.");
+    //         }
+    //         if (nuevoUsuario.getEstado().isEmpty()) {
+    //             throw new IllegalArgumentException("El estado no puede ser vacío.");
+    //         }
+    
+    //         Usuario usuario = new Usuario(
+    //             nuevoUsuario.getNombre(),
+    //             nuevoUsuario.getApellido(),
+    //             nuevoUsuario.getEmail(),
+    //             nuevoUsuario.getEstado(),
+    //             passwordEncoder.encode(nuevoUsuario.getPassword())
+    //         );
+    
+    //         Set<Rol> roles = new HashSet<>();
+    
+    //         for (Rol rol : nuevoUsuario.getRoles()) {
+    //             String rolNombre = rol.getRolNombre(); // Obtén el nombre del rol
+    //             Rol rolEnBaseDeDatos = rolRepository.findByRolNombre(rolNombre);
+    //             if (rolEnBaseDeDatos != null) {
+    //                 roles.add(rolEnBaseDeDatos);
+    //             } else {
+    //                 throw new IllegalArgumentException("El rol '" + rolNombre + "' no existe.");
+    //             }
+    //         }
+    
+    //         usuario.setRoles(roles);
+    //         System.out.println(roles);
+    
+    //         return usuarioRepository.insertarUsuario(
+    //             usuario.getNombre(),
+    //             usuario.getApellido(),
+    //             usuario.getEmail(),
+    //             usuario.getPassword(),
+    //             usuario.getEstado()
+    //         );
+    //     } catch (RuntimeErrorException ex) {
+    //         throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
+    //     } catch (Exception e) {
+    //         throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
+    //     }
+    // }
+    
+
+   
+    
+
+    public Usuario crearUsuarioConRol(Usuario nuevoUsuario) {
         try {
             if (usuarioRepository.existsByEmail(nuevoUsuario.getEmail())) {
                 throw new IllegalArgumentException("El email que ingresaste ya existe.");
@@ -105,44 +166,23 @@ public class UsuarioService {
                 throw new IllegalArgumentException("El estado no puede ser vacío.");
             }
     
-            Usuario usuario = new Usuario(
+            String hashedPassword = passwordEncoder.encode(nuevoUsuario.getPassword());
+            
+            return usuarioRepository.crearUsuarioConRol(
                 nuevoUsuario.getNombre(),
                 nuevoUsuario.getApellido(),
                 nuevoUsuario.getEmail(),
+                hashedPassword,
                 nuevoUsuario.getEstado(),
-              passwordEncoder.encode(nuevoUsuario.getPassword())
-              //  nuevoUsuario.getPassword()
+                nuevoUsuario.getRoles().iterator().next().getRolNombre().toString()
             );
-    
-            Set<Rol> roles = new HashSet<>();
-    
-            for (Rol rol : nuevoUsuario.getRoles()) {
-                String rolNombre = rol.getRolNombre(); // Obtén el nombre del rol
-                Rol rolEnBaseDeDatos = rolRepository.findByRolNombre(rolNombre);
-                if (rolEnBaseDeDatos != null) {
-                    roles.add(rolEnBaseDeDatos);
-                } else {
-                    throw new IllegalArgumentException("El rol '" + rolNombre + "' no existe.");
-                }
-            }
-    
-            usuario.setRoles(roles);
-            System.out.println(roles);
-    
-            return usuarioRepository.insertarUsuario(
-                usuario.getNombre(),
-                usuario.getApellido(),
-                usuario.getEmail(),
-                usuario.getPassword(),
-                usuario.getEstado()
-            );
-        } catch (RuntimeErrorException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex.getCause());
         } catch (Exception e) {
             throw new IllegalArgumentException("Error " + e.getMessage(), e.getCause());
         }
     }
     
-
 }
 
+ 

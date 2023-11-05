@@ -66,7 +66,7 @@ public class UsuarioController {
   @PostMapping("create")
   public ResponseEntity<?> insertarUsuario(@Valid @RequestBody Usuario usuario) {
     try {
-      Usuario newUsuario = usuarioService.crearUsuario(usuario); // Pasa el objeto Usuario completo
+      Usuario newUsuario = usuarioService.crearUsuarioConRol(usuario); // Pasa el objeto Usuario completo
       return new ResponseEntity<>(newUsuario, HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);

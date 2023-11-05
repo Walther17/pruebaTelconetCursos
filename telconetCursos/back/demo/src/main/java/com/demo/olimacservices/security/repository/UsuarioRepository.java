@@ -24,13 +24,25 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByEmail(String email);
     boolean existsById(Integer id);
 
-    @Query(value = "SELECT * FROM insertar_usuario(:nombre, :apellido, :email, :password, :estado);", nativeQuery = true)
-    public Usuario insertarUsuario(
-        @Param("nombre") String nombre, 
-        @Param("apellido") String apellido, 
-        @Param("email") String email, 
-        @Param("password") String password,
-            @Param("estado") String estado);
+    // @Query(value = "SELECT * FROM insertar_usuario(:nombre, :apellido, :email, :password, :estado);", nativeQuery = true)
+    // public Usuario insertarUsuario(
+    //     @Param("nombre") String nombre, 
+    //     @Param("apellido") String apellido, 
+    //     @Param("email") String email, 
+    //     @Param("password") String password,
+    //     @Param("estado") String estado);
+
+    @Query(value = "SELECT * FROM crear_usuario_con_rol(:nombre, :apellido, :email, :password, :estado, :rolNombre);", nativeQuery = true)
+    Usuario crearUsuarioConRol(
+        String nombre,
+        String apellido,
+        String email,
+        String password,
+        String estado,
+        String rolNombre
+    );
+    
+
     
     @Query(value = "SELECT * FROM obtener_usuario_por_id(:p_usuario_id)", nativeQuery = true)
     public Usuario obtenerUsuarioPorId(@Param("p_usuario_id") Integer usuarioId);

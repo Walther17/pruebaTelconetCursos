@@ -10,6 +10,7 @@ import com.demo.olimacservices.entidades.InscripcionCurso;
 import com.demo.olimacservices.repository.CursoRepository;
 import com.demo.olimacservices.repository.InscripcionesCursoRepository;
 import com.demo.olimacservices.security.entity.Usuario;
+import com.demo.olimacservices.security.repository.UsuarioRepository;
 
 @Service
 @Transactional
@@ -21,14 +22,23 @@ public class InscripcionesCursoService {
     @Autowired
     private CursoRepository cursoRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public InscripcionCurso suscribirUsuarioACurso(Curso curso, Usuario usuario) {
         try {
             
             boolean existeInscripcion = inscripcionCursoRepository.existeInscripcion(curso.getId(), usuario.getId());
-        
-            if (existeInscripcion) {
+         
+
+             if (!cursoRepository.existsById(curso.getId())) {
+                throw new IllegalArgumentException("El ID del curso no existe");
+            }if(!usuarioRepository.existsById(usuario.getId())){
+                throw new IllegalArgumentException("El ID del usuario no existe.");
+            }if (existeInscripcion) {
                 throw new RuntimeException("El usuario ya se encuentra inscrito en este curso.");
-            } else {
+            }
+             else {
                 InscripcionCurso inscripcion = inscripcionCursoRepository.crearInscripcionCurso(curso.getId(), usuario.getId());
                 return inscripcion;
             }

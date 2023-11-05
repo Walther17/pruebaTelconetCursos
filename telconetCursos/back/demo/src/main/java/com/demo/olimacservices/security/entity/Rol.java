@@ -3,6 +3,8 @@ package com.demo.olimacservices.security.entity;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,24 +15,25 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import com.demo.olimacservices.security.enums.RolNombre;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+
+@Data  
 @Entity
 @Table(name = "rol")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Rol {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull
-// @Enumerated(EnumType.STRING)
-    private String rolNombre;
+    @Enumerated(EnumType.STRING)
+    private RolNombre rolNombre;
 
     @CreatedDate
     @Column(name = "fe_creacion", nullable = false, updatable = false)
@@ -46,5 +49,8 @@ public class Rol {
     @Pattern(regexp = "[AI]", message = "El campo estado solo puede tener los valores: A Activo, I Inactivo")
     private String estado;
 
+ 
+
 }
+
 
