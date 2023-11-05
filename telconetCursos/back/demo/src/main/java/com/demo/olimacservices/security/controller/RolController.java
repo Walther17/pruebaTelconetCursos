@@ -43,12 +43,13 @@ public class RolController {
         try {
             Rol rolCreado = rolService.crearRol(rol.getRolNombre(), rol.getEstado());
             return new ResponseEntity<>(rolCreado, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(new Mensaje("Error interno del servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
 
     @PutMapping("update/{id}")
     public ResponseEntity<?> actualizarRol(@PathVariable Integer id, @RequestBody Rol rol) {

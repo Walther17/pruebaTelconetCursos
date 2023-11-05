@@ -58,24 +58,22 @@ public class RolService {
     }
 
     public Rol crearRol(RolNombre nombre, String estado) {
-    
         try {
-            if(rolRepository.existsByRolNombre(nombre)){
-             throw new IllegalArgumentException("El nombre del rol ya existe.");
-             }
-             if (nombre == null){
-             throw new IllegalArgumentException("El nombre del rol no puede ser vacío.");
-            } if (estado.isEmpty()){
-             throw new IllegalArgumentException("El estado del rol no puede ser vacío.");
+            if (nombre == null) {
+                throw new RuntimeException("El nombre del rol no puede ser nulo.");
+            }
+            if (estado.isEmpty()) {
+                throw new RuntimeException("El estado del rol no puede estar vacío.");
+            }
+            if (rolRepository.existsByRolNombre(nombre)) {
+                throw new RuntimeException("El nombre del rol ya existe.");
             }
             return rolRepository.crearRol(nombre, estado);
-            
-        }catch (RuntimeException ex) {
-             throw new IllegalArgumentException(ex.getMessage().toString(), ex.getCause());
         } catch (Exception e) {
-             throw new IllegalArgumentException("Error", e.getCause());
+            throw new RuntimeException(e.getMessage());
         }
     }
+    
 
     public Rol eliminarRol(Integer rolId) {
         try {
