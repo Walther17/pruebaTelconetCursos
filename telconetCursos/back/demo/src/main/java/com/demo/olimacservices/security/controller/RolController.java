@@ -41,7 +41,7 @@ public class RolController {
     @PostMapping("create")
     public ResponseEntity<?> crear(@Valid @RequestBody Rol rol) {
         try {
-            Rol rolCreado = rolService.crearRol(rol.getRolNombre(), rol.getEstado());
+            Rol rolCreado = rolService.crearRol(rol.getRolNombre().toString(), rol.getEstado());
             return new ResponseEntity<>(rolCreado, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.NOT_FOUND);
@@ -54,7 +54,7 @@ public class RolController {
     @PutMapping("update/{id}")
     public ResponseEntity<?> actualizarRol(@PathVariable Integer id, @RequestBody Rol rol) {
         try {
-            rolService.actualizarRol(id, rol.getRolNombre(), rol.getEstado());
+            rolService.actualizarRol(id, rol.getRolNombre().toString(), rol.getEstado());
             return new ResponseEntity<>(rol, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Mensaje(e.getMessage()), HttpStatus.BAD_REQUEST);

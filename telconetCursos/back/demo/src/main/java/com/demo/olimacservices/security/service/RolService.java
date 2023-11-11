@@ -16,7 +16,7 @@ public class RolService {
     @Autowired
     RolRepository rolRepository;
 
-    public Optional<Rol>  getByRolNombre(RolNombre rolNombre){
+    public Optional<Rol>  getByRolNombre(String rolNombre){
         try {
             return rolRepository.findByRolNombre(rolNombre);
         } catch (RuntimeException ex) {
@@ -42,7 +42,7 @@ public class RolService {
         
     }
 
-     public Rol actualizarRol(Integer id, RolNombre nombre, String estado) {
+     public Rol actualizarRol(Integer id, String nombre, String estado) {
     
         try {
              if(!rolRepository.existsById(id)){
@@ -57,7 +57,7 @@ public class RolService {
         }
     }
 
-    public Rol crearRol(RolNombre nombre, String estado) {
+    public Rol crearRol(String nombre, String estado) {
         try {
             if (nombre == null) {
                 throw new RuntimeException("El nombre del rol no puede ser nulo.");

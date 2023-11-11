@@ -357,3 +357,51 @@ $$ LANGUAGE plpgsql;
 
 
 -------------------------------------------------------
+
+-- LOGIN
+ {
+      
+        "email": "dev_@gmail.com",
+        "password": "new"
+        
+}
+
+-- USUARIOS
+-- create
+{
+    "nombre": "Walther",
+    "apellido": "Olivo",
+    "email": "dev___@gmail.com",
+    "password": "xd",
+    "estado": "A",
+    "roles": [
+        {
+        "rolNombre": "ROLE_CREADOR"
+        }
+    ]
+}
+-- update
+{
+        "nombre": "Walther",
+        "apellido": "Olivo",
+        "email": "dev_@gmail.com",
+        "password": "new",
+        "estado": "A"
+}
+-- DELETE
+http://localhost:8080/usuarios/eliminar/2
+-- CURSOS
+-- CREATE
+{
+    "nombre": "Spring Boddot",
+    "creador": {
+        "id": 1
+    },
+    "estado": "A"
+}
+--- UPDATE
+{
+    "nombre": "curso actualizado sprinGGGGGGGGGGGGGGGG",
+    "estado": "A"
+}
+--  
